@@ -72,9 +72,9 @@
 <!-- Login 1 end -->
 
 <!-- External JS libraries -->
-<script src="<?php echo base_url()?>assets/login-assets/jquery.min.js"></script>
+<script src="<?php echo base_url()?>assets_arsip/login-assets/jquery.min.js"></script>
  
-<script src="<?php echo base_url()?>assets/login-assets/bootstrap.bundle.min.js"></script>
+<script src="<?php echo base_url()?>assets_arsip/login-assets/bootstrap.bundle.min.js"></script>
 <!-- Custom JS Script -->
 <script>
     $("#msg").hide();
