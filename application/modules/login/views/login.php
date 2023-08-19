@@ -8,14 +8,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- External CSS libraries -->
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url()?>assets/login-assets/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url()?>assets_arsip/login-assets/bootstrap.min.css">
  
-    <link href="<?php echo base_url()?>assets/css/icons.css" rel="stylesheet">
+    <link href="<?php echo base_url()?>assets_arsip/css/icons.css" rel="stylesheet">
  
   
     <!-- Custom Stylesheet -->
-    <link type="text/css" rel="stylesheet" href="<?php echo base_url()?>assets/login-assets/style.css">
-    <link rel="stylesheet" type="text/css" id="style_sheet" href="<?php echo base_url()?>assets/login-assets/default.css">
+    <link type="text/css" rel="stylesheet" href="<?php echo base_url()?>assets_arsip/login-assets/style.css">
+    <link rel="stylesheet" type="text/css" id="style_sheet" href="<?php echo base_url()?>assets_arsip/login-assets/default.css">
 	<script src='https://www.google.com/recaptcha/api.js'></script>
 </head>
 <body id="top">
