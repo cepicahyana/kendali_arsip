@@ -1,0 +1,13 @@
+ @font-face 
+  {
+    font-family: 'monotype';  
+	 font-style: TrueType;
+	font-weight: 400;
+    src: url('../fonts/monotype.ttf'); 
+  }
+ 
+ .monotype
+  {
+    font-family: 'monotype';
+ 
+  }
