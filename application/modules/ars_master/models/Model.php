@@ -2,7 +2,7 @@
 
 class Model extends CI_Model  {
     
-	var $tbl="admin";
+
  
  	function __construct()
     {
