@@ -3,8 +3,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Ars_master extends CI_Controller {
 
-
-	var $tbl="admin";
+ 
 	function __construct()
 	{
 		parent::__construct();	
