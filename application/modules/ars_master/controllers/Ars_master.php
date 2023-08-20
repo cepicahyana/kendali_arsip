@@ -1,14 +1,14 @@
 <?php 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Data_master extends CI_Controller {
+class Ars_master extends CI_Controller {
 
 
 	var $tbl="admin";
 	function __construct()
 	{
 		parent::__construct();	
-		$this->m_konfig->validasi_session(array("admin_covid","super_admin","admin_data"));
+		$this->m_konfig->validasi_session(array("admin_covid","super_admin","admin_arsip"));
 		$this->load->model("model","mdl");
 		$this->load->model("model_deputi","deputi");
 		$this->load->model("model_test","test");
@@ -25,7 +25,7 @@ class Data_master extends CI_Controller {
 
 	function _template($data)
 	{
-		$this->load->view('temp_main/main',$data);	
+		$this->load->view('temp_arsip/main',$data);	
 	}
 	
 
@@ -49,18 +49,20 @@ class Data_master extends CI_Controller {
 	
 
 
-	public function biro()
+	public function tingkat_perkembangan()
 	{
 
 		$ajax=$this->input->post("ajax");
+		$var["title"]		=	"Tingkat perkembangan";
+		$var["subtitle"]	=	"Master / Tingkat perkembangan";
 		if($ajax=="yes")
 		{
-			$var["data"]=$this->load->view("biro",null,true);
+			$var["data"]=$this->load->view("tingkat_perkembangan",null,true);
 			$var["token"]=$this->m_reff->getToken();
 			echo json_encode($var);
 		}else{
-			$data['konten']="biro";
-			$this->_template($data);
+			$var['konten']="tingkat_perkembangan";
+			$this->_template($var);
 		}
 		
 	}  

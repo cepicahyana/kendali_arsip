@@ -300,7 +300,7 @@
 
 			<!-- container -->
 			<div class="main-container container-fluid">
-
+			<input type="hidden" name="token_footer" id="token_footer" value="">
 			 	<!-- row -->
 				<div class="row">
                 <?=$this->load->view("temp_arsip/konten");?>

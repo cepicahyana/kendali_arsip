@@ -7,7 +7,7 @@
 		<a href="#top" id="back-to-top"><i class="las la-angle-double-up"></i></a>
 
 		<!--- JQuery min js --->
-		<script src="<?=base_url();?>assets_arsip/plugins/jquery/jquery.min.js"></script>
+		
 
 		<!--- Bootstrap Bundle js --->
 		<script src="<?=base_url();?>assets_arsip/plugins/bootstrap/popper.min.js"></script>
@@ -86,7 +86,8 @@
                 token=data["token"];
                 $('.modal.aside').remove();
                 history.replaceState(title, title, url);
-                $('title').html(title);
+                $('#bread_title').html(data["title"]);
+                $('#bread_subtitle').html(data["subtitle"]);
                 $(".content").html(data["data"]);
                 }
             });

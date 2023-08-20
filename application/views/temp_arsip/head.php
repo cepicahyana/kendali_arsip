@@ -11,7 +11,7 @@
 
 		<!-- Title -->
 		<title> Azira -  Premium dashboard ui bootstrap rwd admin html5 template </title>
-        <script src="<?php echo base_url()?>assets_arsip/plugins/jquery/jquery.min.js"></script>
+		<script src="<?=base_url();?>assets_arsip/plugins/jquery/jquery.min.js"></script>
 		<!--- Favicon --->
 		<link rel="icon" href="<?=base_url();?>assets_arsip/img/brand/favicon.png" type="image/x-icon"/>
 
@@ -36,7 +36,7 @@
         <script src="<?php echo base_url()?>plug/jqueryform/jquery.form.js"></script>
         <script src="<?php echo base_url()?>plug/blokui.js"></script>
         <script src="<?php echo base_url()?>plug/js/angular.js"></script>
-        <script src="<?php echo base_url()?>plug/js/formajax.js"></script>
+        <script src="<?php echo base_url()?>plug/js/form_ajax.js"></script>
 
 		<!--- Select2 css-->
 		<link href="<?php echo base_url()?>assets_arsip/plugins/select2/css/select2.min.css" rel="stylesheet">
@@ -52,4 +52,10 @@
         <script type="text/javascript" src="<?php echo base_url()?>plug/date/date_range.js"></script>
         <script src="<?php echo base_url()?>plug/js/highcart.js"></script>
         <script src="<?php echo base_url()?>plug/js/highcart-3d.js"></script> 
+		<script>
+            function cantik(){
+                return '<div><div class="spinner-grow text-primary" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-secondary" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-success" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-danger" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-warning" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-info" role="status"> <span class="sr-only">Loading...</span> </div><div class="spinner-grow text-dark" role="status"> <span class="sr-only">Loading...</span> </div>  <div class="spinner-grow text-light" role="status"> <span class="sr-only">Loading...</span> </div> </div>';
+            }
+            var token="";
+        </script>
 	</head>

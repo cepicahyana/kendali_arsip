@@ -1,18 +1,4 @@
- 
- 
 
-		<!-- breadcrumb -->
-        <div class="breadcrumb-header justify-content-between">
-						<div>
-							<h4 class="content-title mb-2">Data master</h4>
-							<nav aria-label="breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="#">Data master</a></li>
-									<li class="breadcrumb-item active" aria-current="page">Admin</li>
-								</ol>
-							</nav>
-						</div>
-	 </div>
  
     <div class="card">
          
@@ -74,7 +60,7 @@
 					}
 				});
 
-				var url   = "<?php echo site_url("data_master/hapus_admin");?>";
+				var url   = "<?php echo site_url("ars_master/hapus_admin");?>";
         var param = {<?php echo $this->m_reff->tokenName()?>:token,id:id};
         $.ajax({
           type: "POST",dataType: "json",data: param, url: url,
@@ -98,7 +84,8 @@
       var table;
       var  dataTable = $('#table').DataTable({ 
       	"paging": true,
-        "processing": false, //Feature control the processing indicator.
+        "processing": false, 
+        "ordering":false,
         "language": {
         	"sSearch": "Pencarian",
         	"processing": ' <span class="sr-only dataTables_processing">Loading...</span> <br><b style="color:black;background:white">Proses menampilkan data<br> Mohon Menunggu..</b>',
@@ -111,7 +98,7 @@
         	"sInfo": "Total :  _TOTAL_ , Halaman (_START_ - _END_)",
         	"sInfoEmpty": "Tidak ada data yang di tampilkan",
         	"sZeroRecords": "Data tidak tersedia",
-        	"lengthMenu": "Tampil _MENU_ Baris",  
+        	"lengthMenu": "&nbsp;&nbsp;Tampil _MENU_ Baris",  
         },
 
 
@@ -125,28 +112,23 @@
         buttons: [
            // 'copy', 'csv', 'excel', 'pdf', 'print'
            {
-           	text: ' Refresh  ',
+           	text: '<i class="fe fe-refresh-cw"></i>    ',
            	action: function ( e, dt, node, config ) {
            		reload_table();
-           	},className: 'btn  btn-secondary  '
+           	},className: 'btn  btn-secondary-light'
            },
-        //    {
-        //    	text: ' Download Xl ',
-        //    	action: function ( e, dt, node, config ) {
-        //    		download();
-        //    	},className: 'btn   btn-outline-success  '
-        //    }, 
-		// {
-		// 	  text: 'Input ',
-        //         action: function ( e, dt, node, config ) {
-        //            download();
-        //         },className: 'btn   btn-outline-success  '
-        //         }, 
+            
+           {   extend: 'excel',
+ 				text: '<i class="fe fe-download"></i>', exportOptions: {
+                    columns:[0,1,2,3,4,5]
+                },
+                className: 'btn  btn-secondary-light'
+ 			},
         {
-        	text: 'Tambah ',
+        	text: '<i class="fe fe-plus"></i> Tambah ',
         	action: function ( e, dt, node, config ) {
         		add();
-        	},className: 'btn   btn-outline-success  '
+        	},className: 'btn  btn-secondary-light'
         }, 
 
 
@@ -155,7 +137,7 @@
         
         // Load data for the table's content from an Ajax source
         "ajax": {
-        	"url": "<?php echo site_url('data_master/getData_admin');?>",
+        	"url": "<?php echo site_url('ars_master/getData_admin');?>",
         	"type": "POST",
         	"data": function ( data ) {
         		data.<?php echo $this->m_reff->tokenName()?>=token;
@@ -192,7 +174,7 @@
 
       function add()
       {
-        var url   = "<?php echo site_url("data_master/viewAdd_admin");?>";
+        var url   = "<?php echo site_url("ars_master/viewAdd_admin");?>";
         var param = {<?php echo $this->m_reff->tokenName()?>:token};
         $.ajax({
          type: "POST",dataType: "json",data: param, url: url,
@@ -206,7 +188,7 @@
 
       function edit(id)
       {	 
-        var url   = "<?php echo site_url("data_master/viewEdit_admin");?>";
+        var url   = "<?php echo site_url("ars_master/viewEdit_admin");?>";
         var param = {<?php echo $this->m_reff->tokenName()?>:token,id:id};
         $.ajax({
          type: "POST",dataType: "json",data: param, url: url,
