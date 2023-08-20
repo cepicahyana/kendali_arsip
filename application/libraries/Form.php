@@ -6,19 +6,24 @@ class Form
 	
 	 
 /* =============================== FORM INPUT TEXT ==================================================*/
-	public function input($field=null,$title=null,$help=null,$atr=null,$focus=null )
+	public function input($data )
 	{
+		$focus = isset($data["focus"])?($data["focus"]):null;
+		$name = isset($data["name"])?($data["name"]):null;
+		$title = isset($data["title"])?($data["title"]):null;
+		$value = isset($data["value"])?($data["value"]):null;
 		 if($focus)
 		 {
 			$focus="focused"; 
 		 }
-		return '<div class="form-group form-float">
-                                    <div class="form-line '.$focus.'">
-                                        <input name="'.$field.'" class="form-control" type="text" '.$atr.'>
-                                        <label class="form-label col-blue-grey"  >'.$title.'</label>
-                                    </div>
-									<div class="help-info"><i>'.$help.'</i></div>
-                                </div>';
+		return '<div class="row row-xs align-items-center mg-b-20">
+		<div class="col-md-4">
+			<label class="form-label mg-b-0 text-black">Nama </label>
+		</div>
+		<div class="col-md-8 mg-t-5 mg-md-t-0">
+			<input class="form-control text-black"   name="'.$name.'"  placeholder="'.$title.'..." type="text" value="'.$value.'">
+		</div>
+	</div>';
 	}
 	public function input1($field=null,$title=null,$help=null,$atr=null,$focus=null)
 	{

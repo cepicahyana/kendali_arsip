@@ -1,39 +1,22 @@
-
- 
-    <div class="card">
-         
+    <div class="card">         
         <div class="row card-body" style='padding-top:10px;padding-bottom:20px'>
-
-        	<div class="col-md-12" id="area_lod">
-        		
+        	<div class="col-md-7" id="area_lod">
         		<table id='table' width="100%" class="tabel black table-striped table-bordered table-hover dataTable">
 				  	<thead>
 				  		<tr>
-				  					<th class='thead'  width='15px'>&nbsp;NO</th>
+				  				<th class='thead'  width='15px'>No</th>
 									<th class='thead' >Nama </th>  
-                  <th class='thead' >Istana </th>
-                  <th class='thead' >Biro </th>  
-									<!-- <th class='thead' >Jenis Kelamin</th>   -->
-									<!-- <th class='thead' >Alamat </th>	   -->
-									<th class='thead' >No.Telp </th>
-									<th class='thead' >Email </th>
-									<th class='thead' >Hapus </th>	  
+									<th class='thead' width='200px' ># </th>	  
 				  		</tr>	 
 					</thead>
 				</table>
         	</div>
         </div>
- 
 </div>	
-							
- 
-       
- <!-- #END# Task Info -->
-
+						
 
 <script type="text/javascript">
 	function hapus(id,akun){
-
 		swal({
 			title: 'Hapus ?',
 			text: akun,
@@ -60,7 +43,7 @@
 					}
 				});
 
-				var url   = "<?php echo site_url("ars_master/hapus_admin");?>";
+				var url   = "<?php echo site_url("ars_master/hapus_tingkat_perkambangan");?>";
         var param = {<?php echo $this->m_reff->tokenName()?>:token,id:id};
         $.ajax({
           type: "POST",dataType: "json",data: param, url: url,
@@ -69,13 +52,8 @@
             reload_table();
           }
         });
-
       }  
     });
-
-
-
-
 	};
 
 	
@@ -100,9 +78,7 @@
         	"sZeroRecords": "Data tidak tersedia",
         	"lengthMenu": "&nbsp;&nbsp;Tampil _MENU_ Baris",  
         },
-
-
-        "serverSide": true, //Feature control DataTables' server-side processing mode.
+        "serverSide": true, 
         "responsive": true,
         "searching": true,
         "lengthMenu":
@@ -110,7 +86,6 @@
         [10 ,20,30,50], ], 
         dom: 'Blfrtip',
         buttons: [
-           // 'copy', 'csv', 'excel', 'pdf', 'print'
            {
            	text: '<i class="fe fe-refresh-cw"></i>    ',
            	action: function ( e, dt, node, config ) {
@@ -120,24 +95,20 @@
             
            {   extend: 'excel',
  				text: '<i class="fe fe-download"></i>', exportOptions: {
-                    columns:[0,1,2,3,4,5]
+                    columns:[0,1]
                 },
                 className: 'btn  btn-secondary-light'
  			},
         {
         	text: '<i class="fe fe-plus"></i> Tambah ',
         	action: function ( e, dt, node, config ) {
-        		add();
+        		action_form();
         	},className: 'btn  btn-secondary-light'
         }, 
-
-
-
         ],
         
-        // Load data for the table's content from an Ajax source
         "ajax": {
-        	"url": "<?php echo site_url('ars_master/getData_admin');?>",
+        	"url": "<?php echo site_url('ars_master/getData_tingkaPerkembangan');?>",
         	"type": "POST",
         	"data": function ( data ) {
         		data.<?php echo $this->m_reff->tokenName()?>=token;
@@ -151,79 +122,53 @@
         	},
 
         },
-
-        //Set column definition initialisation properties.
         "columnDefs": [
         { 
-          "targets": [ 0,-1,-2,-3,-4,-5 ], //last column
+          "targets": [  ], //last column
           "orderable": false, //set not orderable
         },
         ],
-
       });
       function reload_table()
       {
       	dataTable.ajax.reload(null,false);	
       };
 
-    </script>
+    
 
+       
 
-
-    <script>
-
-      function add()
-      {
-        var url   = "<?php echo site_url("ars_master/viewAdd_admin");?>";
-        var param = {<?php echo $this->m_reff->tokenName()?>:token};
-        $.ajax({
-         type: "POST",dataType: "json",data: param, url: url,
-         success: function(val){
-          $("#mdl_modal_edit").modal();
-          $("#editan").html(val['data']);
-          token=val['token'];
-        }
-      });   
-      }
-
-      function edit(id)
+      function action_form(id=null)
       {	 
-        var url   = "<?php echo site_url("ars_master/viewEdit_admin");?>";
+        $("#mdl_modal").modal("show");
+        if(id){
+          $(".modal-title").html("Update data");
+        }else{
+          $(".modal-title").html("Tambah data");
+        }
+        var url   = "<?php echo site_url("ars_master/form_tingkat_perkembangan");?>";
         var param = {<?php echo $this->m_reff->tokenName()?>:token,id:id};
         $.ajax({
          type: "POST",dataType: "json",data: param, url: url,
          success: function(val){
-          $("#mdl_modal_edit").modal();
-          $("#editan").html(val['data']);
+          $("#response").html(val['data']);
           token=val['token'];
         }
       }); 
       }
-
-
-
     </script>
 
 
 
+ 
 
-    <div class="modal effect-super-scaled" id="mdl_modal_edit" tabindex="-1" role="dialog">
-      <div class="modal-dialog" id="area_modal_edit" role="document">
-        <div id="editan"></div>
-      </div>
-    </form>
-  </div><!-- /.modal-dialog --> 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <div class="modal effect-scale" id="mdl_modal"   role="dialog" >
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content modal-content-demo" id="area_modal">
+					<div class="modal-header">
+						<h6 class="modal-title"> </h6><button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>
+					</div>
+				<div id="response"></div>
+				</div>
+			</div>
+		</div>
