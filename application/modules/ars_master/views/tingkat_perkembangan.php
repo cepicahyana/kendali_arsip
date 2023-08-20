@@ -141,6 +141,7 @@
       function action_form(id=null)
       {	 
         $("#mdl_modal").modal("show");
+        $("#response").html(cantik());
         if(id){
           $(".modal-title").html("Update data");
         }else{
