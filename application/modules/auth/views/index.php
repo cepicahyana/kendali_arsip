@@ -25,7 +25,7 @@
     			});
         } 
       }).error(function () {
-        alert('failed to initialize');
+        console.log('failed to initialize');
       });
     </script>
 </head>
