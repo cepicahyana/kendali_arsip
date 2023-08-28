@@ -15,21 +15,9 @@ class M_login extends CI_Model  {
 		$this->db->where("nip_sso",$nip);
 		return $this->db->get("data_pegawai")->row();
 	}
- 
-    function getLoginRs($nip){
-		$this->db->where("kode",$nip);
-		return $this->db->get("tm_rs")->row();
-	}
- 
-    function getLoginDokter($nip){
-		$this->db->where("nip",$nip);
-		return $this->db->get("data_dokter")->row();
-	}
-    function getLoginKorDokter($nip){
-		$this->db->where("nip",$nip);
-		return $this->db->get("data_kordokter")->row();
-	}
-
+  
+  
+    
 	function validasi_captcha($capca=null){
 		$url = base_url();
 		if($url=="http://localhost/kendalirev/"){
@@ -138,6 +126,7 @@ class M_login extends CI_Model  {
 				$this->db->where("nip",$nip);
 				$this->db->where("nip IS NOT NULL");
 				$this->db->where("nip!=''");
+				$this->db->where("level>=",16);
 				$this->db->where("sts_aktivasi","enable");
 				$cek=$this->db->get("admin")->row();
 				if(isset($cek->id_admin)) //jika login sumber admin
@@ -148,17 +137,26 @@ class M_login extends CI_Model  {
 					$id_biro			=	isset($cek->kode_biro)?($cek->kode_biro):"";
 					$istana				=	isset($cek->kode_istana)?($cek->kode_istana):"";
 					$owner				=	isset($cek->owner)?($cek->owner):"";
+				
 					
 
 									$this->db->where("id_level",$id_level);
 					$get		=	$this->db->get("main_level")->row();
 					
 					$nama_level	=	isset($get->nama)?($get->nama):"";
+					$level_ket	=	isset($get->ket)?($get->ket):"";
 					$direct		=	isset($get->direct)?($get->direct):"";
 					
 					if($get){	 
+						if($cek->jk=="l"){
+							$this->session->set_userdata("gender","cowok");
+						}else{
+							$this->session->set_userdata("gender","cewek");
+						}
+
 							/* simpan sesssion */
 							$this->session->set_userdata("level",$nama_level);
+							$this->session->set_userdata("level_ket",$level_ket);
 							$this->session->set_userdata("id",$id);
 							$this->session->set_userdata("kode_biro",$id_biro);
 							$this->session->set_userdata("kode_istana",$istana);
@@ -181,58 +179,8 @@ class M_login extends CI_Model  {
 					
 				} 
 		
-					$rs = $this->mdl->getLoginRs($nip);
-					if(isset($rs->id)){ //jika loin sebagai RS
-						$type 				=   isset($rs->jenis_pegawai)?($rs->jenis_pegawai):"";
-						$id_level			=	8;
-						$id					=	isset($rs->id)?($rs->id):"";
-						$istana				=	isset($rs->kode_istana)?($rs->kode_istana):"";
-						$this->session->set_userdata("id",$id);
-					//	$this->session->set_userdata("kode_biro",$id_biro);
-						$this->session->set_userdata("kode_istana",$istana);
-						$this->session->set_userdata("username",$rs->nama);
-						$this->session->set_userdata("module","covid");
-						$this->m_reff->log("Login");
-						$this->session->set_userdata("level","rs");
-						 
-							$var["sts"] = true;
-							$var["direct"] = "data_test";
-							return $var;
-					}
-
-
-					$dr = $this->mdl->getLoginDokter($nip);
-					if(isset($dr->id)){ //jika loin sebagai Dokter
-						$id_level			=	9;
-						$id					=	isset($dr->id)?($dr->id):"";
-						$istana				=	isset($dr->kode_istana)?($dr->kode_istana):"";
-						$this->session->set_userdata("id",$id);
-						$this->session->set_userdata("kode_istana",$istana);
-						$this->session->set_userdata("username",$dr->nama);
-						$this->session->set_userdata("module","covid");
-						$this->m_reff->log("Login");
-						$this->session->set_userdata("level","dokter");
-						$var["sts"] = true;
-						$var["direct"] = "dokter";
-						return $var;
-					}
-
-					$dr = $this->mdl->getLoginKorDokter($nip);
-					if(isset($dr->id)){ //jika loin sebagai Dokter
-						$id_level			=	10;
-						$id					=	isset($dr->id)?($dr->id):"";
-						$istana				=	isset($dr->kode_istana)?($dr->kode_istana):"";
-						$this->session->set_userdata("id",$id);
-						$this->session->set_userdata("kode_istana",$istana);
-						$this->session->set_userdata("username",$dr->nama);
-						$this->session->set_userdata("module","covid");
-						$this->m_reff->log("Login");
-						$this->session->set_userdata("level","kordokter");
-						$var["sts"] = true;
-						$var["direct"] = "kordokter";
-						return $var;
-					}
-
+					 
+ 
 
 				
 					$peg = $this->mdl->getLoginPegawai($nip);
@@ -250,21 +198,14 @@ class M_login extends CI_Model  {
 					
 						if($type==1){  //jika login sebagai pegawai PNS
 							$this->session->set_userdata("module","covid");
-							$this->session->set_userdata("level","pegawai");
+							$this->session->set_userdata("level","register");
+							$this->session->set_userdata("level_ket","Register");
 							$this->m_reff->log("Login");
 						 
 							$var["sts"] = true;
-							$var["direct"] = "dpegawai";
+							$var["direct"] = "ars_dashboard";
 							return $var;
-						}elseif($type==2){  //jika login sebagai PPNPN
-							$this->session->set_userdata("module","covid");
-							$this->session->set_userdata("level","ppnpn");
-							$this->m_reff->log("portal ppnpn"); 
-							 
-							$var["sts"] = true;
-							$var["direct"] = "portal";
-							return $var;
-						}
+						} 
 					}else{
 					
 						$length = strlen($nip);
@@ -274,7 +215,7 @@ class M_login extends CI_Model  {
 							$this->db->set("jenis_pegawai",1);
 							$this->db->set("jenis_pegawai",1);
 							$this->db->insert("data_pegawai");
-							$this->sinkron->getSyn($nip);
+							// $this->sinkron->getSyn($nip);
 							$var["sts"] = true;
 							$var["direct"] = "dpegawai";
 							return $var;

@@ -12,12 +12,12 @@
 						<div class="main-sidebar-loggedin">
 							<div class="app-sidebar__user">
 								<div class="dropdown user-pro-body text-center">
-									<div class="user-pic">
-										<img src="<?=base_url();?>assets_arsip/img/faces/6.jpg" alt="user-img" class="rounded-circle mCS_img_loaded">
+									<div class="user-pic"> 
+										<img src="<?=base_url();?>plug/img/<?=$this->session->userdata("gender");?>.png" alt="user-img" class="rounded-circle mCS_img_loaded">
 									</div>
 									<div class="user-info">
-										<h6 class=" mb-0 text-dark">Petey Cruiser</h6>
-										<span class="text-muted app-sidebar__user-name text-sm">Administrator</span>
+										<h6 class=" mb-0 text-dark"><?=$this->session->userdata("username");?></h6>
+										<span class="text-muted app-sidebar__user-name text-sm"><?=$this->session->userdata("level_ket");?></span>
 									</div>
 								</div>
 							</div>

@@ -76,6 +76,7 @@ class Login extends MY_Controller {
 				$this->db->where("nip",$nip);
 				$this->db->where("nip IS NOT NULL");
 				$this->db->where("nip!=''");
+				$this->db->where("level>=",16);
 				$this->db->where("sts_aktivasi","enable");
 				$cek=$this->db->get("admin")->row();
 				if(isset($cek->id_admin)) //jika login sumber admin

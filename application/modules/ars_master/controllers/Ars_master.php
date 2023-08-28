@@ -7,7 +7,7 @@ class Ars_master extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();	
-		$this->m_konfig->validasi_session(array("admin_arsip"));
+		$this->m_konfig->validasi_session(array("admin_arsip","up","uk"));
 		$this->load->model("model","mdl");
 		 
 		date_default_timezone_set('Asia/Jakarta');
