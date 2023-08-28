@@ -18,7 +18,7 @@ class Form
 		 }
 		return '<div class="row row-xs align-items-center mg-b-20">
 		<div class="col-md-4">
-			<label class="form-label mg-b-0 text-black">Nama </label>
+			<label class="form-label mg-b-0 text-black">'.$name.' </label>
 		</div>
 		<div class="col-md-8 mg-t-5 mg-md-t-0">
 			<input class="form-control text-black"   name="'.$name.'"  placeholder="'.$title.'..." type="text" value="'.$value.'">
