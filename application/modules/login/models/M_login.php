@@ -126,7 +126,7 @@ class M_login extends CI_Model  {
 				$this->db->where("nip",$nip);
 				$this->db->where("nip IS NOT NULL");
 				$this->db->where("nip!=''");
-				$this->db->where("level>=",16);
+				$this->db->where("level>=",15);
 				$this->db->where("sts_aktivasi","enable");
 				$cek=$this->db->get("admin")->row();
 				if(isset($cek->id_admin)) //jika login sumber admin
