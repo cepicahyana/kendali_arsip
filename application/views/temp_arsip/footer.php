@@ -53,7 +53,7 @@
         <script src="<?php echo base_url()?>assets_arsip/plugins/sumoselect/jquery.sumoselect.js"></script>
 		<!--swither-styles js-->
 		<script src="<?=base_url();?>assets_arsip/js/swither-styles.js"></script>
-        <script src="<?php echo base_url()?>assets/js/plugins/sweetalert.min.js"></script>
+        <script src="<?php echo base_url()?>assets_arsip/js/sweetalert.min.js"></script>
 		<!--- Custom js --->
 		<script src="<?=base_url();?>assets_arsip/js/custom.js"></script>
         <script type="text/javascript"> 
