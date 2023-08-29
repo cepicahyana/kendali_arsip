@@ -19,7 +19,7 @@ class Form
 		 }
 
 		 if(!$label){
-			$label = $name;
+			$label = $title;
 		 }
 		return '<div class="row row-xs align-items-center mg-b-20">
 		<div class="col-md-4">
