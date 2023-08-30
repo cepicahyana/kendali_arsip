@@ -122,6 +122,279 @@ class Ars_master extends CI_Controller {
 		$var["token"]=$this->m_reff->getToken();
 		echo json_encode($var);
 	}
+
+
+	//master unit_kearsipan-------------------------------------------------------------------------------------
+	public function unit_kearsipan()
+	{
+		$ajax=$this->input->post("ajax");
+		$var["title"]		=	"Unit Kearsipan";
+		$var["subtitle"]	=	"Master / Unit Kearsipan";
+		if($ajax=="yes")
+		{
+			$var["data"]=$this->load->view("unit_kearsipan",null,true);
+			$var["token"]=$this->m_reff->getToken();
+			echo json_encode($var);
+		}else{
+			$var['konten']="unit_kearsipan";
+			$this->_template($var);
+		}
+
+	} 
+
+	function getData_unitKearsipan()
+	{
+		if(!$this->m_reff->san($this->input->post("draw"))){ echo $this->m_reff->page403(); return false;}
+		$list = $this->mdl->getData_unitKearsipan();
+		$data = array();
+		$no = $this->m_reff->san($this->input->post("start"));
+		$no =$no+1;
+		foreach ($list as $val) {
+		////
+		$type="";
+		if($val->type==1){
+			$type="Unit Kearsipan I";
+		}
+		if($val->type==2){
+			$type="Unit Kearsipan II";
+		}
+		if($val->type==3){
+			$type="Unit Kearsipan III";
+		}
+
+		if($val->parent_uuid){
+			$getUuid=$this->db->get_where("ars_tr_uk",array("parent_uuid"=>$val->parent_uuid))->row();
+			$type_parent=$getUuid->type??"";
+			if($type_parent==1){
+				$parent="";
+			}
+			if($type_parent==2){
+				$parent="Unit Kearsipan I";
+			}
+			if($type_parent==3){
+				$parent="Unit Kearsipan II";
+			}
+		}else{
+			$parent="";
+		}
+
+		if($val->organization_kode){
+			$getOrg=$this->db->get_where("ars_tr_organisasi",array("kode"=>$val->organization_kode))->row();
+			$nama_organisasi=$getOrg->nama??"";
+		}else{
+			$nama_organisasi="";
+		}
+
+		
+
+		$tombol='<div aria-label="Basic example" class="btn-groupss" role="group">
+		<button   onclick="action_form(`'.$val->id.'`,`'.$val->description.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
+		<button style="color:white" onclick="hapus(`'.$val->id.'`,`'.$val->description.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
+		</div>';
+
+
+		$row = array();
+		$row[] = $no++;	
+		$row[] = $type;
+		$row[] = $parent;
+		$row[] = $val->description;
+		$row[] = $nama_organisasi;
+		$row[] = $val->status;
+		
+		$row[] = $tombol;
+		$data[] = $row; 
+
+		}
+
+		$output = array(
+			"draw" => $this->m_reff->san($this->input->post("draw")),
+			"recordsTotal" => $c=$this->mdl->count_unitKearsipan(),
+			"recordsFiltered" =>$c,
+			"data" => $data,
+			"token"=>$this->m_reff->getToken()
+		);
+		//output to json format
+		echo json_encode($output);
+
+	} 
+	function form_unit_kearsipan(){ 
+		$var["data"]=$this->load->view("form_unit_kearsipan",NULL,TRUE);
+		$var["token"]=$this->m_reff->getToken();
+		echo json_encode($var);
+	}
+	function update_unit_kearsipan(){
+		$f=$this->input->post();
+		if(!$f){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->update_unit_kearsipan();
+		echo json_encode($data);
+	}
+	function hapus_unit_kearsipan(){
+		$id = $this->m_reff->san($this->input->post("id"));
+		if(!$id){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->hapus_unit_kearsipan();
+		echo json_encode($data);
+	}
+	function get_parent_unit_kearsipan(){
+	    $action = $this->input->post('action');
+		$kode = $this->input->post('kd');
+		$jmlkode=strlen($kode);
+		if($action=='form'){
+			$list = '<option value="">=== Pilih ===</option>';
+		}else{
+			$list = '<option value="">=== Pilih ===</option>';
+		}
+
+        $db = $this->db->order_by('description','ASC');
+		$db = $this->db->get_where('ars_tr_uk',array('type'=>$kode))->result();
+		foreach($db as $val)
+		{
+			$list .= "<option value='" . $val->uuid . "'>" . $val->description . "</option>";
+		}
+		$var["data"]=$list;
+		$var["token"]=$this->m_reff->getToken();
+		echo json_encode($var);
+	}
+	// function get_organisasi(){
+	//     $action = $this->input->post('action');
+	// 	$kode = $this->input->post('kd');
+	// 	$jmlkode=strlen($kode);
+	// 	if($action=='form'){
+	// 		$list = '<option value="">=== Pilih ===</option>';
+	// 	}else{
+	// 		$list = '<option value="">=== Pilih ===</option>';
+	// 	}
+
+	// 	$get = $this->db->get_where('ars_tr_uk',array('parent_uuid'=>$kode))->row();
+	// 	$type=$get->type??'';
+	// 	$this->db->select("LENGTH(kode) as jml, kode,nama");
+	// 	if($type==1){
+	// 		$this->db->where("jml","2");
+	// 		$this->db->where("kode","01");
+	// 		$this->db->order_by('kode','ASC');
+	// 		$db = $this->db->get('ars_tr_organisasi')->result();
+	// 		foreach($db as $val)
+	// 		{
+	// 			$list .= "<option value='" . $val->kode . "'>" . $val->nama . "</option>";
+	// 		}
+	// 	}
+	// 	if($type==2){
+	// 		$this->db->where("jml","6");
+	// 		$this->db->order_by('kode','ASC');
+	// 		$db = $this->db->get('ars_tr_organisasi')->result();
+	// 		foreach($db as $val)
+	// 		{
+	// 			$list .= "<option value='" . $val->kode . "'>" . $val->nama . "</option>";
+	// 		}
+	// 	}
+	// 	if($type==3){
+	// 		$this->db->where("jml","8");
+	// 		$this->db->order_by('kode','ASC');
+	// 		$db = $this->db->get('ars_tr_organisasi')->result();
+	// 		foreach($db as $val)
+	// 		{
+	// 			$list .= "<option value='" . $val->kode . "'>" . $val->nama . "</option>";
+	// 		}
+	// 	}
+
+        
+	// 	$var["data"]=$list;
+	// 	$var["token"]=$this->m_reff->getToken();
+	// 	echo json_encode($var);
+	// }
+
+	//master unit_pengelola-------------------------------------------------------------------------------------
+	public function unit_pengelola()
+	{
+		$ajax=$this->input->post("ajax");
+		$var["title"]		=	"Unit Pengelola";
+		$var["subtitle"]	=	"Master / Unit Pengelola";
+		if($ajax=="yes")
+		{
+			$var["data"]=$this->load->view("unit_pengelola",null,true);
+			$var["token"]=$this->m_reff->getToken();
+			echo json_encode($var);
+		}else{
+			$var['konten']="unit_pengelola";
+			$this->_template($var);
+		}
+
+	} 
+	function getData_unitPengelola()
+	{
+		if(!$this->m_reff->san($this->input->post("draw"))){ echo $this->m_reff->page403(); return false;}
+		$list = $this->mdl->getData_unitPengelola();
+		$data = array();
+		$no = $this->m_reff->san($this->input->post("start"));
+		$no =$no+1;
+		foreach ($list as $val) {
+		////
+
+		if($val->uk_uuid){
+			$getUk=$this->db->get_where("ars_tr_uk",array("uuid"=>$val->uk_uuid))->row();
+			$unit_kearsipan=$getUk->description??"";
+		}else{
+			$unit_kearsipan="";
+		}
+
+		if($val->organisasi_kode){
+			$getOrg=$this->db->get_where("ars_tr_organisasi",array("kode"=>$val->organisasi_kode))->row();
+			$nama_organisasi=$getOrg->nama??"";
+		}else{
+			$nama_organisasi="";
+		}
+
+		
+
+		$tombol='<div aria-label="Basic example" class="btn-groupss" role="group">
+		<button   onclick="action_form(`'.$val->id.'`,`'.$val->description.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
+		<button style="color:white" onclick="hapus(`'.$val->id.'`,`'.$val->description.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
+		</div>';
+
+
+		$row = array();
+		$row[] = $no++;	
+		$row[] = $unit_kearsipan;
+		$row[] = $nama_organisasi;
+		$row[] = $val->description;
+		$row[] = $val->status;
+		
+		$row[] = $tombol;
+		$data[] = $row; 
+
+		}
+
+		$output = array(
+			"draw" => $this->m_reff->san($this->input->post("draw")),
+			"recordsTotal" => $c=$this->mdl->count_unitPengelola(),
+			"recordsFiltered" =>$c,
+			"data" => $data,
+			"token"=>$this->m_reff->getToken()
+		);
+		//output to json format
+		echo json_encode($output);
+
+	} 
+	function form_unit_pengelola(){ 
+		$var["data"]=$this->load->view("form_unit_pengelola",NULL,TRUE);
+		$var["token"]=$this->m_reff->getToken();
+		echo json_encode($var);
+	}
+	function update_unit_pengelola(){
+		$f=$this->input->post();
+		if(!$f){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->update_unit_pengelola();
+		echo json_encode($data);
+	}
+	function hapus_unit_pengelola(){
+		$id = $this->m_reff->san($this->input->post("id"));
+		if(!$id){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->hapus_unit_pengelola();
+		echo json_encode($data);
+	}
  
 
 }
