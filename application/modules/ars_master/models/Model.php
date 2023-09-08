@@ -117,8 +117,7 @@ class Model extends CI_Model  {
 			}		 
 		$query=$this->db->from("ars_tr_uk");
 		return $query;
-	}
-	
+	}	
 	public function count_unitKearsipan()
 	{				
 			$this->_getData_unitKearsipan();
@@ -126,12 +125,16 @@ class Model extends CI_Model  {
 	}
 
     function update_unit_kearsipan(){
-        $id = $this->input->post("id");
+        $uuid = $this->input->post("uuid");
         $form = $this->input->post("f");
         $type=$this->input->post("f[type]");
+        $nip_pegawai = $this->input->post("nip_pegawai[]");
+        $posisi = $this->input->post("posisi[]");
+        
+        $form = $this->input->post("f");
         $this->db->set($form);
-        if($id){
-            $get=$this->db->get_where("ars_tr_uk",array("id"=>$id))->row();
+        if($uuid){
+            $get=$this->db->get_where("ars_tr_uk",array("uuid"=>$uuid))->row();
             $type_b=$get->type??'';
             $cek=$this->db->get_where("ars_tr_uk",array("type!="=>$type_b,"type"=>$type))->num_rows();
             if($cek){
@@ -142,8 +145,41 @@ class Model extends CI_Model  {
             }
             $this->db->set("_uid",$this->session->userdata("nip"));
             $this->db->set("_utime",date('Y-m-d H:i:s'));
-            $this->db->where("id",$id);
+            $this->db->where("uuid",$uuid);
             $this->db->update("ars_tr_uk");
+
+            $arr1_data=array();
+            $arr2_data=array();
+            foreach($nip_pegawai as $key=>$value) {
+                if($value){
+                    foreach($posisi as $k=>$v) {
+                        if($key==$k){
+                            $ceks=$this->db->get_where("ars_tr_uk_employee",array("employee_nip="=>$value,"uk_uuid"=>$uuid))->num_rows();
+                            if($ceks){
+                                $arr1_data[]  = array(
+                                    'employee_nip' => $value,
+                                    'posisi_type' => $v,
+                                    'status' => 1,
+                                    'uk_uuid' => $uuid
+                                );
+                            }else{
+                                $arr2_data[]  = array(
+                                    'employee_nip' => $value,
+                                    'posisi_type' => $v,
+                                    'status' => 1,
+                                    'uk_uuid' => $uuid
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+            if($arr1_data!=array()){
+                $this->db->update_batch("ars_tr_uk_employee",$arr1_data,'employee_nip');
+            }
+            if($arr2_data!=array()){
+                $this->db->insert_batch("ars_tr_uk_employee",$arr2_data);
+            }
             $this->m_reff->log("update data unit kearsipan");
         }else{
             if($type==1){
@@ -159,6 +195,28 @@ class Model extends CI_Model  {
             $this->db->set("_cid",$this->session->userdata("nip"));
             $this->db->set("_ctime",date('Y-m-d H:i:s'));
             $this->db->insert("ars_tr_uk");
+
+            $guk=$this->db->order_by('id','DESC');
+            $guk=$this->db->get("ars_tr_uk")->row();
+            $uk_uuid=$guk->uuid??null;
+            $arr1_data=array();
+            foreach($nip_pegawai as $key=>$value) {
+                if($value){
+                    foreach($posisi as $k=>$v) {
+                        if($key==$k){
+                            $arr1_data[]  = array(
+                                'employee_nip' => $value,
+                                'posisi_type' => $v,
+                                'status' => 1,
+                                'uk_uuid' => $uk_uuid
+                            );
+                        }
+                    }
+                }
+            }
+            if($arr1_data!=array()){
+                $this->db->insert_batch("ars_tr_uk_employee",$arr1_data);
+            }
             $this->m_reff->log("menambahkan data unit kearsipan");
         }
         return true;
@@ -166,8 +224,12 @@ class Model extends CI_Model  {
 
     function hapus_unit_kearsipan(){
         $id = $this->input->post("id");
-        $this->db->where("id",$id);
-        return $this->db->delete("ars_tr_uk");
+        $this->db->where("uuid",$id);
+        $hapusUK=$this->db->delete("ars_tr_uk");
+        if($hapusUK){
+            $this->db->where("uk_uuid",$id);
+            return $this->db->delete("ars_tr_uk_employee");
+        }
     }
 
 
@@ -225,7 +287,7 @@ class Model extends CI_Model  {
             $this->db->set("_utime",date('Y-m-d H:i:s'));
             $this->db->where("id",$id);
             $this->db->update("ars_tr_up");
-            $this->m_reff->log("update data unit kearsipan");
+            $this->m_reff->log("update data unit pengelola");
         }else{
             // if($type==1){
             //     $cek=$this->db->get_where("ars_tr_up",array("type"=>1))->num_rows();
@@ -240,7 +302,7 @@ class Model extends CI_Model  {
             $this->db->set("_cid",$this->session->userdata("nip"));
             $this->db->set("_ctime",date('Y-m-d H:i:s'));
             $this->db->insert("ars_tr_up");
-            $this->m_reff->log("menambahkan data unit kearsipan");
+            $this->m_reff->log("menambahkan data unit pengelola");
         }
         return true;
     }
@@ -250,6 +312,406 @@ class Model extends CI_Model  {
         $this->db->where("id",$id);
         return $this->db->delete("ars_tr_up");
     }
+
+
+    /*======= KLASIFIKASI ARSIP =========----------------------------------------------------------------------------*/
+	function getData_KlasifikasiArsip()
+	{
+		 $this->_getData_KlasifikasiArsip();
+		if($this->m_reff->san($this->input->post("length")!=-1)) 
+		$this->db->limit($this->m_reff->san($this->input->post("length")),$this->m_reff->san($this->input->post("start")));
+	 	return $this->db->get()->result();
+		 
+	}
+	function _getData_KlasifikasiArsip()
+	{
+		  
+		    if (strlen(isset($_POST['search']['value'])?($_POST['search']['value']):null)>=1) {
+                $searchkey = $_POST['search']['value'];
+                $searchkey = $this->m_reff->sanitize($searchkey);
+				$query=array(
+                    "nama"=>$searchkey,
+				    "deskripsi"=>$searchkey,
+                 
+				);
+				$this->db->group_start()
+                        ->or_like($query)
+                ->group_end();
+				
+			}		 
+		$query=$this->db->from("ars_tr_kka");
+		return $query;
+	}
+	
+	public function count_KlasifikasiArsip()
+	{				
+			$this->_getData_KlasifikasiArsip();
+		return $this->db->get()->num_rows();
+	}
+
+    function update_klasifikasi_arsip(){
+        $uuid = $this->input->post("uuid");
+        $form = $this->input->post("f");
+        $level=$this->input->post("f[level]");
+
+        $parent_kode=$this->input->post("parent_kode".$level."");;
+        $kode=$this->input->post("kode".$level."");
+        $nama=$this->input->post("nama".$level."");
+        $deskripsi=$this->input->post("deskripsi".$level."");
+
+        if($parent_kode){
+            $parent_kode=$parent_kode;
+        }else{
+            $parent_kode=null;
+        }
+
+        $this->db->set("parent_kode",$parent_kode);
+        $this->db->set("kode",$kode);
+        $this->db->set("nama",$nama);
+        $this->db->set("deskripsi",$deskripsi);
+        
+        $this->db->set($form);
+        if($uuid){
+            $get=$this->db->get_where("ars_tr_kka",array("uuid"=>$uuid))->row();
+            $kode_b=$get->kode??'';
+            $cek=$this->db->get_where("ars_tr_kka",array("level"=>$level,"kode!="=>$kode_b,"kode"=>$kode))->num_rows();
+            if($cek){
+                $var["gagal"]=true;
+                $var["info"]="kode klasifikasi arsip sudah ada";
+                $var["token"]=$this->m_reff->getToken();
+                return $var;
+            }
+            $this->db->set("_uid",$this->session->userdata("nip"));
+            $this->db->set("_utime",date('Y-m-d H:i:s'));
+            $this->db->where("uuid",$uuid);
+            $this->db->update("ars_tr_kka");
+            $this->m_reff->log("update data klasifikasi arsip ");
+        }else{
+            $cek=$this->db->get_where("ars_tr_kka",array("level"=>$level,"kode"=>$kode))->num_rows();
+            if($cek){
+                $var["gagal"]=true;
+                $var["info"]="kode klasifikasi arsip sudah ada";
+                $var["token"]=$this->m_reff->getToken();
+                return $var;
+            }
+            $this->db->set('status',1);
+            $this->db->set("_cid",$this->session->userdata("nip"));
+            $this->db->set("_ctime",date('Y-m-d H:i:s'));
+            $this->db->insert("ars_tr_kka");
+            $this->m_reff->log("menambahkan data klasifikasi arsip ");
+        }
+        return true;
+    }
+
+    function hapus_klasifikasi_arsip(){
+        $id = $this->input->post("id");
+        $this->db->where("uuid",$id);
+        return $this->db->delete("ars_tr_kka");
+        
+    }
+
+
+    /*======= FOLDER =========----------------------------------------------------------------------------*/
+	function getData_folder()
+	{
+		 $this->_getData_folder();
+		if($this->m_reff->san($this->input->post("length")!=-1)) 
+		$this->db->limit($this->m_reff->san($this->input->post("length")),$this->m_reff->san($this->input->post("start")));
+	 	return $this->db->get()->result();
+		 
+	}
+	function _getData_folder()
+	{
+		  
+		    if (strlen(isset($_POST['search']['value'])?($_POST['search']['value']):null)>=1) {
+                $searchkey = $_POST['search']['value'];
+                $searchkey = $this->m_reff->sanitize($searchkey);
+				$query=array(
+
+				"code"=>$searchkey,
+				"number"=>$searchkey,
+				"deskripsi"=>$searchkey
+                 
+				);
+				$this->db->group_start()
+                        ->or_like($query)
+                ->group_end();
+				
+			}		 
+		$query=$this->db->from("ars_trx_folder");
+		return $query;
+	}
+	
+	public function count_folder()
+	{				
+			$this->_getData_folder();
+		return $this->db->get()->num_rows();
+	}
+
+    function update_folder(){
+        $uuid = $this->input->post("uuid");
+        $form = $this->input->post("f");
+        $code=$this->input->post("f[code]");
+        $number=$this->input->post("f[number]");
+        $tahun=$this->input->post("tahun");
+        $jumlah=$this->input->post("jumlah");
+        
+        if($uuid){
+            $this->db->set($form);
+            $get=$this->db->get_where("ars_trx_folder",array("uuid"=>$uuid))->row();
+            $code_b=$get->code??'';
+            $number_b=$get->number??'';
+            $cek=$this->db->get_where("ars_trx_folder",array("code!="=>$code_b,"code"=>$code,"number!="=>$number_b,"number"=>$number,"substr(code,2,4)"=>$tahun))->num_rows();
+            if($cek){
+                $var["gagal"]=true;
+                $var["info"]="Kode sudah ada";
+                $var["token"]=$this->m_reff->getToken();
+                return $var;
+            }
+            $this->db->set("_uid",$this->session->userdata("nip"));
+            $this->db->set("_utime",date('Y-m-d H:i:s'));
+            $this->db->where("uuid",$uuid);
+            $this->db->update("ars_trx_folder");
+            $this->m_reff->log("update data folder");
+        }else{
+           
+            for($i=0;$i<$jumlah;$i++){
+                $genereate=$this->generate_kode_folder($tahun);
+                $kodefolder='F'.$tahun.$genereate.'';
+                //cek dulu
+                $this->db->where("code",$kodefolder);
+                $this->db->where("number",$genereate);
+                $this->db->where("substr(code,2,4)",''.$tahun.'');
+                $cek=$this->db->get("ars_trx_folder")->num_rows();
+                if($cek)
+                {
+                    $var["gagal"]=true;
+                    $var["info"]="Kode sudah ada";
+                    $var["token"]=$this->m_reff->getToken();
+                    return $var;
+                }
+                $this->db->set("code",$kodefolder);
+                $this->db->set("number",$genereate);
+                $this->db->set("status",1);
+                $this->db->set("_uid",$this->session->userdata("nip"));
+                $this->db->set("_utime",date('Y-m-d H:i:s'));
+                $this->db->insert("ars_trx_folder");
+                $this->m_reff->log("menambahkan data folder");
+
+            }
+        }
+        return true;
+    }
+
+    function hapus_folder(){
+        $id = $this->input->post("id");
+        $this->db->where("uuid",$id);
+        return $this->db->delete("ars_trx_folder");
+    }
+
+    function generate_kode_folder($tahun){
+        $this->db->select("(MAX(SUBSTR(code,6,5))+1) as kodefolder");
+        $this->db->where("substr(code,2,4)",''.$tahun.'');
+        $t = $this->db->get("ars_trx_folder")->row();
+        $idv=isset($t->kodefolder)?($t->kodefolder):''; 
+        if(!$idv){  return "00001"; }
+        $gen=sprintf("%05s", $idv);
+        return  $gen;
+    }
+
+
+
+    /*======= BOX =========----------------------------------------------------------------------------*/
+	function getData_box()
+	{
+		 $this->_getData_box();
+		if($this->m_reff->san($this->input->post("length")!=-1)) 
+		$this->db->limit($this->m_reff->san($this->input->post("length")),$this->m_reff->san($this->input->post("start")));
+	 	return $this->db->get()->result();
+		 
+	}
+	function _getData_box()
+	{
+		  
+		    if (strlen(isset($_POST['search']['value'])?($_POST['search']['value']):null)>=1) {
+                $searchkey = $_POST['search']['value'];
+                $searchkey = $this->m_reff->sanitize($searchkey);
+				$query=array(
+
+				"code"=>$searchkey,
+				"nomor"=>$searchkey,
+				"deskripsi"=>$searchkey
+                 
+				);
+				$this->db->group_start()
+                        ->or_like($query)
+                ->group_end();
+				
+			}		 
+		$query=$this->db->from("ars_trx_box");
+		return $query;
+	}
+	
+	public function count_box()
+	{				
+			$this->_getData_box();
+		return $this->db->get()->num_rows();
+	}
+
+    function update_box(){
+        $uuid = $this->input->post("uuid");
+        $form = $this->input->post("f");
+        $code=$this->input->post("f[code]");
+        $nomor=$this->input->post("f[nomor]");
+        $tahun=$this->input->post("tahun");
+        $jumlah=$this->input->post("jumlah");
+        
+        if($uuid){
+            $this->db->set($form);
+            $get=$this->db->get_where("ars_trx_box",array("uuid"=>$uuid))->row();
+            $code_b=$get->code??'';
+            $nomor_b=$get->nomor??'';
+            $cek=$this->db->get_where("ars_trx_box",array("code!="=>$code_b,"code"=>$code,"nomor!="=>$nomor_b,"nomor"=>$nomor,"substr(code,2,4)"=>$tahun))->num_rows();
+            if($cek){
+                $var["gagal"]=true;
+                $var["info"]="Kode sudah ada";
+                $var["token"]=$this->m_reff->getToken();
+                return $var;
+            }
+            $this->db->set("_uid",$this->session->userdata("nip"));
+            $this->db->set("_utime",date('Y-m-d H:i:s'));
+            $this->db->where("uuid",$uuid);
+            $this->db->update("ars_trx_box");
+            $this->m_reff->log("update data box");
+        }else{
+           
+            for($i=0;$i<$jumlah;$i++){
+                $genereate=$this->generate_kode_box($tahun);
+                $kodebox='B'.$tahun.$genereate.'';
+                //cek dulu
+                $this->db->where("code",$kodebox);
+                $this->db->where("nomor",$genereate);
+                $this->db->where("substr(code,2,4)",''.$tahun.'');
+                $cek=$this->db->get("ars_trx_box")->num_rows();
+                if($cek)
+                {
+                    $var["gagal"]=true;
+                    $var["info"]="Kode sudah ada";
+                    $var["token"]=$this->m_reff->getToken();
+                    return $var;
+                }
+                $this->db->set("code",$kodebox);
+                $this->db->set("nomor",$genereate);
+                $this->db->set("status",1);
+                $this->db->set("_uid",$this->session->userdata("nip"));
+                $this->db->set("_utime",date('Y-m-d H:i:s'));
+                $this->db->insert("ars_trx_box");
+                $this->m_reff->log("menambahkan data box");
+
+            }
+        }
+        return true;
+    }
+
+    function hapus_box(){
+        $id = $this->input->post("id");
+        $this->db->where("uuid",$id);
+        return $this->db->delete("ars_trx_box");
+    }
+
+    function generate_kode_box($tahun){
+        $this->db->select("(MAX(SUBSTR(code,6,5))+1) as kodebox");
+        $this->db->where("substr(code,2,4)",''.$tahun.'');
+        $t = $this->db->get("ars_trx_box")->row();
+        $idv=isset($t->kodebox)?($t->kodebox):''; 
+        if(!$idv){  return "00001"; }
+        $gen=sprintf("%05s", $idv);
+        return  $gen;
+    }
+
+
+
+    /*======= JRA =========----------------------------------------------------------------------------*/
+	function getData_jra()
+	{
+		 $this->_getData_jra();
+		if($this->m_reff->san($this->input->post("length")!=-1)) 
+		$this->db->limit($this->m_reff->san($this->input->post("length")),$this->m_reff->san($this->input->post("start")));
+	 	return $this->db->get()->result();
+		 
+	}
+	function _getData_jra()
+	{
+		  
+		    if (strlen(isset($_POST['search']['value'])?($_POST['search']['value']):null)>=1) {
+                $searchkey = $_POST['search']['value'];
+                $searchkey = $this->m_reff->sanitize($searchkey);
+				$query=array(
+
+				"nama"=>$searchkey,
+				"deskripsi"=>$searchkey
+                 
+				);
+				$this->db->group_start()
+                        ->or_like($query)
+                ->group_end();
+				
+			}		 
+		$query=$this->db->from("ars_tr_jra");
+		return $query;
+	}
+	
+	public function count_jra()
+	{				
+			$this->_getData_jra();
+		return $this->db->get()->num_rows();
+	}
+
+    function update_jra(){
+        $uuid = $this->input->post("uuid");
+        $form = $this->input->post("f");
+        $type=$this->input->post("f[type]");
+        $this->db->set($form);
+        if($uuid){
+            // $get=$this->db->get_where("ars_tr_jra",array("id"=>$id))->row();
+            // $type_b=$get->type??'';
+            // $cek=$this->db->get_where("ars_tr_jra",array("type!="=>$type_b,"type"=>$type))->num_rows();
+            // if($cek){
+            //     $var["gagal"]=true;
+            //     $var["info"]="Unit Kearsipan I sudah ada";
+            //     $var["token"]=$this->m_reff->getToken();
+            //     return $var;
+            // }
+            $this->db->set("_uid",$this->session->userdata("nip"));
+            $this->db->set("_utime",date('Y-m-d H:i:s'));
+            $this->db->where("uuid",$uuid);
+            $this->db->update("ars_tr_jra");
+            $this->m_reff->log("update data jarak retensi arsip");
+        }else{
+            // if($type==1){
+            //     $cek=$this->db->get_where("ars_tr_jra",array("type"=>1))->num_rows();
+            //     if($type){
+            //         $var["gagal"]=true;
+            //         $var["info"]="Unit Kearsipan I sudah ada";
+            //         $var["token"]=$this->m_reff->getToken();
+            //         return $var;
+            //     }
+            // }
+            $this->db->set('status',1);
+            $this->db->set("_cid",$this->session->userdata("nip"));
+            $this->db->set("_ctime",date('Y-m-d H:i:s'));
+            $this->db->insert("ars_tr_jra");
+            $this->m_reff->log("menambahkan data jarak retensi arsip");
+        }
+        return true;
+    }
+
+    function hapus_jra(){
+        $id = $this->input->post("id");
+        $this->db->where("uuid",$id);
+        return $this->db->delete("ars_tr_jra");
+    }
+
 
 
 }

@@ -51,13 +51,13 @@
 												</div>
 											</div>
 										</div>
-										<a  class="dropdown-item  mt-2 clickmenu"   href="javascript:void(0);"><i class="dropdown-icon"></i>Unit Kearsipan</a>
-										<a class="dropdown-item" href="javascript:void(0);"><i class="dropdown-icon"></i>Unit Pengolah (UP)</a>
-										<a class="dropdown-item" href="javascript:void(0);"><i class="dropdown-icon"></i>Klasifikasi</a>
+										<a class="dropdown-item mt-2 menuclick" href="<?=base_url();?>ars_master/unit_kearsipan"><i class="dropdown-icon"></i>Unit Kearsipan</a>
+										<a class="dropdown-item mb-2 menuclick" href="<?=base_url();?>ars_master/unit_pengelola"><i class="dropdown-icon"></i>Unit Pengolah (UP)</a>
+										<a class="dropdown-item mb-2 menuclick" href="<?=base_url();?>ars_master/klasifikasi_arsip"><i class="dropdown-icon"></i>Klasifikasi</a>
 										<!-- <div class="dropdown-divider"></div> -->
-										<a class="dropdown-item" href="javascript:void(0);"><i class="dropdown-icon"></i>JRA (Jangka Retensi Arsip)</a>
-										<a class="dropdown-item mb-2 menuclick" href="javascript:void(0);"><i class="dropdown-icon "></i> Folder</a>
-										<a class="dropdown-item mb-2 menuclick" href="javascript:void(0);"><i class="dropdown-icon "></i> Kotak</a>
+										<a class="dropdown-item mb-2 menuclick" href="<?=base_url();?>ars_master/jra"><i class="dropdown-icon"></i>JRA (Jangka Retensi Arsip)</a>
+										<a class="dropdown-item mb-2 menuclick" href="<?=base_url();?>ars_master/folder"><i class="dropdown-icon "></i> Folder</a>
+										<a class="dropdown-item mb-2 menuclick" href="<?=base_url();?>ars_master/box"><i class="dropdown-icon "></i> Kotak</a>
 										<a class="dropdown-item mb-2 menuclick" href="<?=base_url();?>ars_master/tingkat_perkembangan"><i class="dropdown-icon "></i> Tingkat Perkembangan</a>
 										<a class="dropdown-item mb-2 menuclick" href="javascript:void(0);"><i class="dropdown-icon "></i> Media Arsip</a>
 										<a class="dropdown-item mb-2 menuclick" href="javascript:void(0);"><i class="dropdown-icon "></i> Jenis Arsip</a>

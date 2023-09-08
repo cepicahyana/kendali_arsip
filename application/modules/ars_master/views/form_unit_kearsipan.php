@@ -1,122 +1,171 @@
 <?php
 $id = $this->m_reff->san($this->input->post("id"));
-$data = $this->db->get_where("ars_tr_uk",array("id"=>$id))->row();
+$val = $this->db->get_where("ars_tr_uk",array("uuid"=>$id))->row();
 
-$id = isset($data->id)?($data->id):null;
-$type = isset($data->type)?($data->type):"";
-$uuid = isset($data->uuid)?($data->uuid):"";
-$parent_uuid = isset($data->parent_uuid)?($data->parent_uuid):"";
-$description = isset($data->description)?($data->description):null;
-$organization_kode = isset($data->organization_kode)?($data->organization_kode):"";
+$id = isset($val->id)?($val->id):null;
+$uuid = isset($val->uuid)?($val->uuid):null;
+$type = isset($val->type)?($val->type):"";
+$parent_uuid = isset($val->parent_uuid)?($val->parent_uuid):"";
+$description = isset($val->description)?($val->description):null;
+$organization_kode = isset($val->organization_kode)?($val->organization_kode):"";
 ?>
 
  
-
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <div class="modal-body">
 <form  action="javascript:submitForm('modal')" id="modal" url="<?php echo base_url()?>ars_master/update_unit_kearsipan"  method="post" enctype="multipart/form-data">
-			<input type="hidden" value="<?php echo $id?>" name="id">
-			<input type="hidden" id="formToken" name="<?php echo $this->m_reff->tokenName()?>" value="<?php echo $this->m_reff->getToken()?>">
-			<div class="row row-xs align-items-center mg-b-20">
-				<div class="col-md-4">
-					<label class="form-label mg-b-0 text-black">Unit Kearsipan </label>
+		<input type="hidden" value="<?php echo $uuid?>" name="uuid">
+		<input type="hidden" id="formToken" name="<?php echo $this->m_reff->tokenName()?>" value="<?php echo $this->m_reff->getToken()?>">
+		<div class="row mg-b-20">
+			<div class="col-md-12">
+				<div class="row row-xs align-items-center mg-b-20">
+					<div class="col-md-4">
+						<label class="form-label mg-b-0 text-black">Unit Kearsipan </label>
+					</div>
+					<div class="col-md-8 mg-t-5 mg-md-t-0">
+					<?php 
+					$valray=array();
+					$valray[""]="=== Pilih ===";
+					$valray["1"]="Unit Kearsipan I";
+					$valray["2"]="Unit Kearsipan II";
+					$valray["3"]="Unit Kearsipan III";
+					echo form_dropdown("f[type]",$valray,$type,'class="form-control text-black" style="width:100%" onchange="get_parent_unit_kearsipan(this.value)"');
+					?>
+					</div>
 				</div>
-				<div class="col-md-8 mg-t-5 mg-md-t-0">
-				<?php 
-				$dataray=array();
-				$dataray[""]="=== Pilih ===";
-				$dataray["1"]="Unit Kearsipan I";
-				$dataray["2"]="Unit Kearsipan II";
-				$dataray["3"]="Unit Kearsipan III";
-				echo form_dropdown("f[type]",$dataray,$type,'class="form-control text-black" style="width:100%" onchange="get_parent_unit_kearsipan(this.value)"');
-				?>
+				<div id="parent_uk" class="row row-xs align-items-center mg-b-20">
+					<div class="col-md-4">
+						<label class="form-label mg-b-0 text-black">Parent Unit Kearsipan </label>
+					</div>
+					<div class="col-md-8 mg-t-5 mg-md-t-0">
+					<?php 
+					$valray=array();
+					$valray[""]="=== Pilih ===";
+					if($uuid){
+						$db = $this->db->order_by('description','ASC');
+						$db = $this->db->where('type',$type);
+						$db = $this->db->get('ars_tr_uk')->result();
+						foreach($db as $v)
+						{
+							$stype="";
+							if($v->type==1){
+								$stype="Unit Kearsipan I";
+							}
+							if($v->type==2){
+								$stype="Unit Kearsipan II";
+							}
+							if($v->type==3){
+								$stype="Unit Kearsipan III";
+							}
+
+							if($val->organization_kode){
+								$getOrg=$this->db->get_where("ars_tr_organisasi",array("kode"=>$v->organization_kode))->row();
+								$nama_organisasi=$getOrg->nama??"";
+							}else{
+								$nama_organisasi="";
+							}
+							$valray[$v->uuid]=$stype.' ('.$nama_organisasi.')';
+						}
+					}
+					echo form_dropdown("f[parent_uuid]",$valray,$uuid,'id="parent_unit_kearsipan" class="form-control select2 pb-2"  style="width:100%"');
+					?>
+					</div>
 				</div>
-			</div>
-			<div class="row row-xs align-items-center mg-b-20">
-				<div class="col-md-4">
-					<label class="form-label mg-b-0 text-black">Parent Unit Kearsipan </label>
+				<div class="row row-xs align-items-top mg-b-20">
+					<div class="col-md-4">
+						<label class="form-label mg-b-0 text-black">Description </label>
+					</div>
+					<div class="col-md-8 mg-t-5 mg-md-t-0">
+					<textarea class="form-control" name="f[description]" rows="3" placeholder="Description"><?php echo $description ?></textarea>
+					<!-- <input type="text" class="form-control" name="f[description]" value="<.?php echo $description ?>" placeholder="Description"> -->
+					</div>
 				</div>
-				<div class="col-md-8 mg-t-5 mg-md-t-0">
-				<?php 
-				$dataray=array();
-				$dataray[""]="=== Pilih ===";
-				if($id){
-					$db = $this->db->order_by('description','ASC');
-					$db = $this->db->where('type',$type);
-					$db = $this->db->get('ars_tr_uk')->result();
+				<div class="row row-xs align-items-center mg-b-20">
+					<div class="col-md-4">
+						<label class="form-label mg-b-0 text-black">Organisasi </label>
+					</div>
+					<div class="col-md-8 mg-t-5 mg-md-t-0">
+					<?php 
+					$valray=array();
+					$valray[""]="=== Pilih ===";
+					$db = $this->db->get('ars_tr_organisasi')->result();
 					foreach($db as $v)
 					{
-						$dataray[$v->uuid]=$v->description;
+						$valray[$v->kode]=$v->nama;
 					}
-				}
-				echo form_dropdown("f[parent_uuid]",$dataray,$uuid,'id="parent_unit_kearsipan" class="form-control select2 pb-2"  style="width:100%"');
-				?>
+					echo form_dropdown("f[organization_kode]",$valray,$organization_kode,'id="organisasi" class="form-control select2 pb-2" style="width:100%" onchange="get_uk_employe(this.value)" required');
+					?>
+					</div>
 				</div>
+	
+				<div id="area_employe_uk"></div>
 			</div>
-			<div class="row row-xs align-items-center mg-b-20">
-				<div class="col-md-4">
-					<label class="form-label mg-b-0 text-black">Description </label>
+			<!-- <div class="col-md-12">
+				<div class="row row-xs align-items-center mg-b-20">
+					<div class="col-md-12">
+						
+					</div>
 				</div>
-				<div class="col-md-8 mg-t-5 mg-md-t-0">
-				<input type="text" class="form-control" name="f[description]" value="<?php echo $description ?>" placeholder="Description">
-				</div>
-			</div>
-			<div class="row row-xs align-items-center mg-b-20">
-				<div class="col-md-4">
-					<label class="form-label mg-b-0 text-black">Organisasi </label>
-				</div>
-				<div class="col-md-8 mg-t-5 mg-md-t-0">
-				<?php 
-				$dataray=array();
-				$dataray[""]="=== Pilih ===";
-				$db = $this->db->get('ars_tr_organisasi')->result();
-				foreach($db as $v)
-				{
-					$dataray[$v->kode]=$v->nama;
-				}
-				echo form_dropdown("f[organization_kode]",$dataray,$organization_kode,'id="organisasi" class="form-control select2 pb-2" style="width:100%" required');
-				?>
-				</div>
-			</div>
-			<?php
-			// $form=array(
-			// 	"name"  => "f[description]",
-			// 	"title" => "Description",
-			// 	"value" => $description
-			// );
-			// echo $this->form->input($form);
-			?>
-			
-			 
-		 
-
+			</div> -->
+		</div>
 
 <div align="right">
-<hr>
-	 <button  onclick="submitForm('modal')" class="btn btn-primary pd-x-30 mg-r-5 mg-t-5"><i class='fa fa-save'></i> Simpan</button>
- </div>
+	<hr>
+	<button  onclick="submitForm('modal')" class="btn btn-primary pd-x-30 mg-r-5 mg-t-5"><i class='fa fa-save'></i> Simpan</button>
+</div>
  
 </form>				
 </div>
 <script>
-	$(function() {
-		$('.select2').select2();
-	});
+	$(function(){
+		$('.select2').select2({
+			dropdownParent: $('#mdl_modal'),
+			tags: true,
+			placeholder: "=== Pilih ===",
+			allowClear: true,
+			width: '100%'
+		});
+		<?php if($uuid && $organization_kode){?>
+			get_uk_employe(`<?=$organization_kode?>`,`<?=$uuid?>`);
+		<?php }?>
+	}); 
 	function get_parent_unit_kearsipan(kd) {
 		var url   = "<?php echo site_url("ars_master/get_parent_unit_kearsipan");?>";
         var param = {<?php echo $this->m_reff->tokenName()?>:token,kd: kd, action:'form'};
-        $.ajax({
+		if(kd==1){
+			$("#parent_uk").hide();
+			$('[name="f[description]"]').val("");
+		}else{
+			$("#parent_uk").show();
+			$.ajax({
+				type: "POST",dataType: "json",data: param, url: url,
+				success: function(val){
+					$("#parent_unit_kearsipan").html(val['data']);
+					$('[name="f[description]"]').val("");
+					token=val['token'];
+				}
+			});
+		}
+        
+	}
+	$('#parent_unit_kearsipan').change(function(){
+		var thisvaltext = $(this).find('option:selected').attr('dt');
+		$('[name="f[description]"]').val(thisvaltext);
+	});
+
+	function get_uk_employe(kd,uuid){
+		var url   = "<?php echo site_url("ars_master/get_uk_employe");?>";
+        var param = {<?php echo $this->m_reff->tokenName()?>:token,kd: kd,uuid:uuid, action:'form'};
+		$("#area_employe_uk").html("<p class='text-center'>Mohon tunggu...</p>");
+		$.ajax({
 			type: "POST",dataType: "json",data: param, url: url,
 			success: function(val){
-			$("#parent_unit_kearsipan").html(val['data']);
-			token=val['token'];
+				$("#area_employe_uk").html(val['data']);
+				token=val['token'];
 			}
 		});
 	}
-	$('#parent_unit_kearsipan').change(function(){
-		var thisvaltext = $(this).find('option:selected').text();
-		$('[name="f[description]"]').val(thisvaltext);
-	});
 	// function get_organisasi(kd) {
 	// 	var url   = "<.?php echo site_url("ars_master/get_organisasi");?>";
     //     var param = {<.?php echo $this->m_reff->tokenName()?>:token,kd: kd, action:'form'};

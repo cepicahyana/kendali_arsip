@@ -44,11 +44,11 @@ class Login extends MY_Controller {
 	}
 
 	function index(){
-		if($this->m_reff->mobile()){
-			$this->load->view("mobile");
-		}else{
+		// if($this->m_reff->mobile()){
+		// 	$this->load->view("mobile");
+		// }else{
 			$this->load->view("login");
-		}
+		// }
 		
 	}
 

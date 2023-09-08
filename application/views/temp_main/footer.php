@@ -38,7 +38,6 @@
 <script src="<?php echo base_url()?>assets/js/custom.js"></script>
 <!--- Select2 js --->
 <script src="<?php echo base_url()?>assets/plugins/select2/js/select2.min.js"></script>
-
 <script src="<?php echo base_url()?>assets/plugins/sumoselect/jquery.sumoselect.js"></script>
  
     <script src="<?php echo base_url()?>assets/js/plugins/bootstrap-notify.min.js"></script>

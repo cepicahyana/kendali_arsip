@@ -151,19 +151,26 @@ class Ars_master extends CI_Controller {
 		$no =$no+1;
 		foreach ($list as $val) {
 		////
-		$type="";
-		if($val->type==1){
+		$id=$val->id??null;
+		$uuid=$val->uuid??null;
+		$type=$val->type??'';
+		$parent_uuid=$val->parent_uuid??'';
+		$organization_kode=$val->organization_kode??'';
+		$description=$val->description??'';
+		$status=$val->status??'';
+
+		if($type==1){
 			$type="Unit Kearsipan I";
 		}
-		if($val->type==2){
+		if($type==2){
 			$type="Unit Kearsipan II";
 		}
-		if($val->type==3){
+		if($type==3){
 			$type="Unit Kearsipan III";
 		}
 
-		if($val->parent_uuid){
-			$getUuid=$this->db->get_where("ars_tr_uk",array("parent_uuid"=>$val->parent_uuid))->row();
+		if($parent_uuid){
+			$getUuid=$this->db->get_where("ars_tr_uk",array("parent_uuid"=>$parent_uuid))->row();
 			$type_parent=$getUuid->type??"";
 			if($type_parent==1){
 				$parent="";
@@ -178,18 +185,23 @@ class Ars_master extends CI_Controller {
 			$parent="";
 		}
 
-		if($val->organization_kode){
-			$getOrg=$this->db->get_where("ars_tr_organisasi",array("kode"=>$val->organization_kode))->row();
+		if($organization_kode){
+			$getOrg=$this->db->get_where("ars_tr_organisasi",array("kode"=>$organization_kode))->row();
 			$nama_organisasi=$getOrg->nama??"";
 		}else{
 			$nama_organisasi="";
 		}
 
-		
+		$jumlah_pegawai=$this->db->get_where("ars_tr_uk_employee",array("uk_uuid"=>$uuid))->num_rows();
+		if($jumlah_pegawai==0){
+			$jml_peg="";
+		}else{
+			$jml_peg=$jumlah_pegawai.' orang';
+		}
 
 		$tombol='<div aria-label="Basic example" class="btn-groupss" role="group">
-		<button   onclick="action_form(`'.$val->id.'`,`'.$val->description.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
-		<button style="color:white" onclick="hapus(`'.$val->id.'`,`'.$val->description.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
+		<button   onclick="action_form(`'.$uuid.'`,`'.$type.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
+		<button style="color:white" onclick="hapus(`'.$uuid.'`,`'.$type.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
 		</div>';
 
 
@@ -197,9 +209,10 @@ class Ars_master extends CI_Controller {
 		$row[] = $no++;	
 		$row[] = $type;
 		$row[] = $parent;
-		$row[] = $val->description;
+		$row[] = $description;
 		$row[] = $nama_organisasi;
-		$row[] = $val->status;
+		$row[] = $jml_peg;
+		$row[] = $status;
 		
 		$row[] = $tombol;
 		$data[] = $row; 
@@ -250,12 +263,37 @@ class Ars_master extends CI_Controller {
 		$db = $this->db->get_where('ars_tr_uk',array('type'=>$kode))->result();
 		foreach($db as $val)
 		{
-			$list .= "<option value='" . $val->uuid . "'>" . $val->description . "</option>";
+			$type="";
+			if($val->type==1){
+				$type="Unit Kearsipan I";
+			}
+			if($val->type==2){
+				$type="Unit Kearsipan II";
+			}
+			if($val->type==3){
+				$type="Unit Kearsipan III";
+			}
+
+			if($val->organization_kode){
+				$getOrg=$this->db->get_where("ars_tr_organisasi",array("kode"=>$val->organization_kode))->row();
+				$nama_organisasi=$getOrg->nama??"";
+			}else{
+				$nama_organisasi="";
+			}
+			$list .= "<option value='" . $val->uuid . "' dt='" . $val->description . "'>" . $type ." (".$nama_organisasi.")</option>";
 		}
 		$var["data"]=$list;
 		$var["token"]=$this->m_reff->getToken();
 		echo json_encode($var);
 	}
+	function get_uk_employe(){
+		$data['kode_organisasi'] = $this->input->post('kd');
+		$data['uuid'] = $this->input->post('uuid');
+		$var["data"]=$this->load->view("pilihan_employe_uk",$data,TRUE);
+		$var["token"]=$this->m_reff->getToken();
+		echo json_encode($var);
+	}
+	
 	// function get_organisasi(){
 	//     $action = $this->input->post('action');
 	// 	$kode = $this->input->post('kd');
@@ -330,16 +368,21 @@ class Ars_master extends CI_Controller {
 		$no =$no+1;
 		foreach ($list as $val) {
 		////
+		$id=$val->id??'';
+		$uk_uuid=$val->uk_uuid??'';
+		$organisasi_kode=$val->organisasi_kode??'';
+		$description=$val->description??'';
+		$status=$val->status??'';
 
-		if($val->uk_uuid){
-			$getUk=$this->db->get_where("ars_tr_uk",array("uuid"=>$val->uk_uuid))->row();
+		if($uk_uuid){
+			$getUk=$this->db->get_where("ars_tr_uk",array("uuid"=>$uk_uuid))->row();
 			$unit_kearsipan=$getUk->description??"";
 		}else{
 			$unit_kearsipan="";
 		}
 
-		if($val->organisasi_kode){
-			$getOrg=$this->db->get_where("ars_tr_organisasi",array("kode"=>$val->organisasi_kode))->row();
+		if($organisasi_kode){
+			$getOrg=$this->db->get_where("ars_tr_organisasi",array("kode"=>$organisasi_kode))->row();
 			$nama_organisasi=$getOrg->nama??"";
 		}else{
 			$nama_organisasi="";
@@ -348,8 +391,8 @@ class Ars_master extends CI_Controller {
 		
 
 		$tombol='<div aria-label="Basic example" class="btn-groupss" role="group">
-		<button   onclick="action_form(`'.$val->id.'`,`'.$val->description.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
-		<button style="color:white" onclick="hapus(`'.$val->id.'`,`'.$val->description.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
+		<button   onclick="action_form(`'.$id.'`,`'.$description.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
+		<button style="color:white" onclick="hapus(`'.$id.'`,`'.$description.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
 		</div>';
 
 
@@ -357,8 +400,8 @@ class Ars_master extends CI_Controller {
 		$row[] = $no++;	
 		$row[] = $unit_kearsipan;
 		$row[] = $nama_organisasi;
-		$row[] = $val->description;
-		$row[] = $val->status;
+		$row[] = $description;
+		$row[] = $status;
 		
 		$row[] = $tombol;
 		$data[] = $row; 
@@ -393,6 +436,421 @@ class Ars_master extends CI_Controller {
 		if(!$id){ return $this->m_reff->page403();}
 
 		$data = $this->mdl->hapus_unit_pengelola();
+		echo json_encode($data);
+	}
+
+
+	//master klasifikasi_arsip-------------------------------------------------------------------------------------
+	public function klasifikasi_arsip()
+	{
+		$ajax=$this->input->post("ajax");
+		$var["title"]		=	"Klasifikasi Arsip";
+		$var["subtitle"]	=	"Master / Klasifikasi Arsip";
+		if($ajax=="yes")
+		{
+			$var["data"]=$this->load->view("klasifikasi_arsip",null,true);
+			$var["token"]=$this->m_reff->getToken();
+			echo json_encode($var);
+		}else{
+			$var['konten']="klasifikasi_arsip";
+			$this->_template($var);
+		}
+
+	} 
+	function getData_KlasifikasiArsip()
+	{
+		if(!$this->m_reff->san($this->input->post("draw"))){ echo $this->m_reff->page403(); return false;}
+		$list = $this->mdl->getData_KlasifikasiArsip();
+		$data = array();
+		$no = $this->m_reff->san($this->input->post("start"));
+		$no =$no+1;
+		foreach ($list as $val) {
+		////
+		$id=$val->id??null;
+		$uuid=$val->uuid??null;
+		$kode=$val->kode??'';
+		$parent_kode=$val->parent_kode??'';
+		$nama=$val->nama??'';
+		$deskripsi=$val->deskripsi??'';
+		$status=$val->status??'';
+		$level=$val->level??'';
+
+
+		$tombol='<div aria-label="Basic example" class="btn-groupss" role="group">
+		<button   onclick="action_form(`'.$uuid.'`,`'.$nama.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
+		<button style="color:white" onclick="hapus(`'.$uuid.'`,`'.$nama.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
+		</div>';
+
+
+		$row = array();
+		$row[] = $no++;	
+		$row[] = $kode;
+		$row[] = $parent_kode;
+		$row[] = $nama;
+		$row[] = $deskripsi;
+		$row[] = $status;
+		$row[] = $tombol;
+		$data[] = $row; 
+
+		}
+
+		$output = array(
+			"draw" => $this->m_reff->san($this->input->post("draw")),
+			"recordsTotal" => $c=$this->mdl->count_KlasifikasiArsip(),
+			"recordsFiltered" =>$c,
+			"data" => $data,
+			"token"=>$this->m_reff->getToken()
+		);
+		//output to json format
+		echo json_encode($output);
+
+	} 
+	function form_klasifikasi_arsip(){ 
+		$var["data"]=$this->load->view("form_klasifikasi_arsip",NULL,TRUE);
+		$var["token"]=$this->m_reff->getToken();
+		echo json_encode($var);
+	}
+	function update_klasifikasi_arsip(){
+		$f=$this->input->post();
+		if(!$f){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->update_klasifikasi_arsip();
+		echo json_encode($data);
+	}
+	function hapus_klasifikasi_arsip(){
+		$id = $this->m_reff->san($this->input->post("id"));
+		if(!$id){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->hapus_klasifikasi_arsip();
+		echo json_encode($data);
+	}
+	function get_kode_klasifikasi_arsip(){
+	    $action = $this->input->post('action');
+		$kode = $this->input->post('kd');
+		$level = $this->input->post('level');
+		$jmlkode=strlen($kode);
+		
+		$list=$this->generate_kode_klasifikasi_arsip($kode,$level);
+		
+		$var["data"]=$list;
+		$var["token"]=$this->m_reff->getToken();
+		echo json_encode($var);
+	}
+	function generate_kode_klasifikasi_arsip($kode,$level){
+		if($level==2){
+			$this->db->select("(MAX(SUBSTR(kode,4,2))+1) as kodenumber");
+			$this->db->where("level",$level);
+			$t = $this->db->get("ars_tr_kka")->row();
+			$idv=isset($t->kodenumber)?($t->kodenumber):''; 
+			if(!$idv){  return "00"; }
+			$gen=sprintf("%02s", $idv);
+			return  $kode.'.'.$gen;
+		}
+		if($level==3){
+			$this->db->select("(MAX(SUBSTR(kode,7,2))+1) as kodenumber");
+			$this->db->where("level",$level);
+			$t = $this->db->get("ars_tr_kka")->row();
+			$idv=isset($t->kodenumber)?($t->kodenumber):''; 
+			if(!$idv){  return "00"; }
+			$gen=sprintf("%02s", $idv);
+			return  $kode.'.'.$gen;
+		}
+	}
+
+
+	//master folder-------------------------------------------------------------------------------------
+	public function folder()
+	{
+		$ajax=$this->input->post("ajax");
+		$var["title"]		=	"Folder";
+		$var["subtitle"]	=	"Master / Folder";
+		if($ajax=="yes")
+		{
+			$var["data"]=$this->load->view("folder",null,true);
+			$var["token"]=$this->m_reff->getToken();
+			echo json_encode($var);
+		}else{
+			$var['konten']="folder";
+			$this->_template($var);
+		}
+
+	} 
+	function getData_folder()
+	{
+		if(!$this->m_reff->san($this->input->post("draw"))){ echo $this->m_reff->page403(); return false;}
+		$list = $this->mdl->getData_folder();
+		$data = array();
+		$no = $this->m_reff->san($this->input->post("start"));
+		$no =$no+1;
+		foreach ($list as $val) {
+		////
+		$id=$val->id??null;
+		$uuid=$val->uuid??null;
+		$box_uuid=$val->box_uuid??'';
+		$code=$val->code??'';
+		$number=$val->number??'';
+		$deskripsi=$val->deskripsi??'';
+		$status=$val->status??'';
+
+		$tahun=substr($code,1,4);
+
+		if($box_uuid){
+			$getBox=$this->db->get_where("ars_trx_box",array("uuid"=>$box_uuid))->row();
+			$box=$getBox->nomor??"";
+		}else{
+			$box="";
+		}
+
+
+		$tombol='<div aria-label="Basic example" class="btn-groupss" role="group">
+		<button   onclick="action_form(`'.$uuid.'`,`'.$code.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
+		<button style="color:white" onclick="hapus(`'.$uuid.'`,`'.$code.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
+		</div>';
+
+
+		$row = array();
+		$row[] = $no++;	
+		$row[] = $box;
+		$row[] = $tahun;
+		$row[] = $code;
+		$row[] = $number;
+		$row[] = $deskripsi;
+		$row[] = $status;
+		
+		$row[] = $tombol;
+		$data[] = $row; 
+
+		}
+
+		$output = array(
+			"draw" => $this->m_reff->san($this->input->post("draw")),
+			"recordsTotal" => $c=$this->mdl->count_folder(),
+			"recordsFiltered" =>$c,
+			"data" => $data,
+			"token"=>$this->m_reff->getToken()
+		);
+		//output to json format
+		echo json_encode($output);
+
+	} 
+	function form_folder(){ 
+		$var["data"]=$this->load->view("form_folder",NULL,TRUE);
+		$var["token"]=$this->m_reff->getToken();
+		echo json_encode($var);
+	}
+	function update_folder(){
+		$f=$this->input->post();
+		if(!$f){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->update_folder();
+		echo json_encode($data);
+	}
+	function hapus_folder(){
+		$id = $this->m_reff->san($this->input->post("id"));
+		if(!$id){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->hapus_folder();
+		echo json_encode($data);
+	}
+
+	//master box-------------------------------------------------------------------------------------
+	public function box()
+	{
+		$ajax=$this->input->post("ajax");
+		$var["title"]		=	"Box";
+		$var["subtitle"]	=	"Master / Box";
+		if($ajax=="yes")
+		{
+			$var["data"]=$this->load->view("box",null,true);
+			$var["token"]=$this->m_reff->getToken();
+			echo json_encode($var);
+		}else{
+			$var['konten']="box";
+			$this->_template($var);
+		}
+
+	} 
+	function getData_box()
+	{
+		if(!$this->m_reff->san($this->input->post("draw"))){ echo $this->m_reff->page403(); return false;}
+		$list = $this->mdl->getData_box();
+		$data = array();
+		$no = $this->m_reff->san($this->input->post("start"));
+		$no =$no+1;
+		foreach ($list as $val) {
+		////
+		$id=$val->id??null;
+		$uuid=$val->uuid??null;
+		$code=$val->code??'';
+		$nomor=$val->nomor??'';
+		$deskripsi=$val->deskripsi??'';
+		$status=$val->status??'';
+
+		$tahun=substr($code,1,4);
+
+		// if($uk_uuid){
+		// 	$getUk=$this->db->get_where("ars_tr_uk",array("uuid"=>$uk_uuid))->row();
+		// 	$unit_kearsipan=$getUk->description??"";
+		// }else{
+		// 	$unit_kearsipan="";
+		// }
+
+
+		$tombol='<div aria-label="Basic example" class="btn-groupss" role="group">
+		<button   onclick="action_form(`'.$uuid.'`,`'.$code.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
+		<button style="color:white" onclick="hapus(`'.$uuid.'`,`'.$code.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
+		</div>';
+
+
+		$row = array();
+		$row[] = $no++;	
+		$row[] = $tahun;
+		$row[] = $code;
+		$row[] = $nomor;
+		$row[] = $deskripsi;
+		$row[] = $status;
+		
+		$row[] = $tombol;
+		$data[] = $row; 
+
+		}
+
+		$output = array(
+			"draw" => $this->m_reff->san($this->input->post("draw")),
+			"recordsTotal" => $c=$this->mdl->count_box(),
+			"recordsFiltered" =>$c,
+			"data" => $data,
+			"token"=>$this->m_reff->getToken()
+		);
+		//output to json format
+		echo json_encode($output);
+
+	} 
+	function form_box(){ 
+		$var["data"]=$this->load->view("form_box",NULL,TRUE);
+		$var["token"]=$this->m_reff->getToken();
+		echo json_encode($var);
+	}
+	function update_box(){
+		$f=$this->input->post();
+		if(!$f){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->update_box();
+		echo json_encode($data);
+	}
+	function hapus_box(){
+		$id = $this->m_reff->san($this->input->post("id"));
+		if(!$id){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->hapus_box();
+		echo json_encode($data);
+	}
+
+
+	//master jra-------------------------------------------------------------------------------------
+	public function jra()
+	{
+		$ajax=$this->input->post("ajax");
+		$var["title"]		=	"Jarak Retensi Arsip";
+		$var["subtitle"]	=	"Master / Jarak Retensi Arsip";
+		if($ajax=="yes")
+		{
+			$var["data"]=$this->load->view("jra",null,true);
+			$var["token"]=$this->m_reff->getToken();
+			echo json_encode($var);
+		}else{
+			$var['konten']="jra";
+			$this->_template($var);
+		}
+
+	} 
+	function getData_jra()
+	{
+		if(!$this->m_reff->san($this->input->post("draw"))){ echo $this->m_reff->page403(); return false;}
+		$list = $this->mdl->getData_jra();
+		$data = array();
+		$no = $this->m_reff->san($this->input->post("start"));
+		$no =$no+1;
+		foreach ($list as $val) {
+		////
+		$id=$val->id??null;
+		$uuid=$val->uuid??null;
+		$nama=$val->nama??'';
+		$deskripsi=$val->deskripsi??'';
+		$retensi_aktif=$val->retensi_aktif??null;
+		$retensi_aktif_deskripsi=$val->retensi_aktif_deskripsi??null;
+		$retensi_inaktif=$val->retensi_inaktif??null;
+		$retensi_inaktif_deskripsi=$val->retensi_inaktif_deskripsi??null;
+		$tindak_lanjut_uuid=$val->tindak_lanjut_uuid??null;
+		$status=$val->status??'';
+
+		if($tindak_lanjut_uuid){
+			$getTL=$this->db->get_where("ars_tr_tindak_lanjut",array("uuid"=>$tindak_lanjut_uuid))->row();
+			$tindak_lanjut=$getTL->nama??"";
+		}else{
+			$tindak_lanjut="";
+		}
+
+		if($retensi_aktif){
+			$raktif="".$retensi_aktif." Tahun ".$retensi_aktif_deskripsi."";
+		}else{
+			$raktif="";
+		}
+		if($retensi_inaktif){
+			$rinaktif="".$retensi_inaktif." Tahun ".$retensi_inaktif_deskripsi."";
+		}else{
+			$rinaktif="";
+		}
+
+	
+		$tombol='<div aria-label="Basic example" class="btn-groupss" role="group">
+		<button   onclick="action_form(`'.$uuid.'`,`'.$nama.'`)" class="font14 btn btn-sm ti-pencil btn-secondary" type="button"> Edit</button> 
+		<button style="color:white" onclick="hapus(`'.$uuid.'`,`'.$nama.'`)" class="font14 btn btn-sm ti-trash bg-danger" type="button"> Hapus</button> 
+		</div>';
+
+
+		$row = array();
+		$row[] = $no++;	
+		$row[] = $nama;
+		$row[] = $deskripsi;
+		$row[] = $raktif;
+		$row[] = $rinaktif;
+		$row[] = $tindak_lanjut;
+		$row[] = $status;
+		
+		$row[] = $tombol;
+		$data[] = $row; 
+
+		}
+
+		$output = array(
+			"draw" => $this->m_reff->san($this->input->post("draw")),
+			"recordsTotal" => $c=$this->mdl->count_jra(),
+			"recordsFiltered" =>$c,
+			"data" => $data,
+			"token"=>$this->m_reff->getToken()
+		);
+		//output to json format
+		echo json_encode($output);
+
+	} 
+	function form_jra(){ 
+		$var["data"]=$this->load->view("form_jra",NULL,TRUE);
+		$var["token"]=$this->m_reff->getToken();
+		echo json_encode($var);
+	}
+	function update_jra(){
+		$f=$this->input->post();
+		if(!$f){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->update_jra();
+		echo json_encode($data);
+	}
+	function hapus_jra(){
+		$id = $this->m_reff->san($this->input->post("id"));
+		if(!$id){ return $this->m_reff->page403();}
+
+		$data = $this->mdl->hapus_jra();
 		echo json_encode($data);
 	}
  

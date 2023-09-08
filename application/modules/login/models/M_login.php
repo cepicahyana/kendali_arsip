@@ -213,7 +213,6 @@ class M_login extends CI_Model  {
 							$this->load->model("sinkron");
 							$this->db->set("nip",$nip);
 							$this->db->set("jenis_pegawai",1);
-							$this->db->set("jenis_pegawai",1);
 							$this->db->insert("data_pegawai");
 							// $this->sinkron->getSyn($nip);
 							$var["sts"] = true;

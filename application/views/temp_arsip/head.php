@@ -51,6 +51,11 @@
         <script type="text/javascript" src="<?php echo base_url()?>plug/date/date_range.js"></script>
         <script src="<?php echo base_url()?>plug/js/highcart.js"></script>
         <script src="<?php echo base_url()?>plug/js/highcart-3d.js"></script> 
+
+		<link href="<?php echo base_url()?>plug/date/daterangepicker.css" rel="stylesheet">
+   <script type="text/javascript" src="<?php echo base_url()?>plug/date/date_moment.js"></script>
+   <script type="text/javascript" src="<?php echo base_url()?>plug/date/date_range.js"></script>
+
 		<script>
             function cantik(){
                 return '<div><div class="spinner-grow text-primary" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-secondary" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-success" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-danger" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-warning" role="status"> <span class="sr-only">Loading...</span> </div> <div class="spinner-grow text-info" role="status"> <span class="sr-only">Loading...</span> </div><div class="spinner-grow text-dark" role="status"> <span class="sr-only">Loading...</span> </div>  <div class="spinner-grow text-light" role="status"> <span class="sr-only">Loading...</span> </div> </div>';

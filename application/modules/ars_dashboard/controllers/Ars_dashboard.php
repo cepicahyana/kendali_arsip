@@ -19,8 +19,8 @@ class Ars_dashboard extends CI_Controller {
 	public function index()
 	{
 		$ajax=$this->input->get_post("ajax");
-		$var["title"] = "Home";
-		$var["subtitle"] = "Dashboard";
+		// $var["title"] = "Home";
+		$var["subtitle"] = "Home/dashboard";
 		if($ajax=="yes")
 		{
 			$var["data"]=$this->load->view("index",null,true);

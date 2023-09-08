@@ -1,6 +1,6 @@
     <div class="card">         
         <div class="row card-body" style='padding-top:10px;padding-bottom:20px'>
-        	<div class="col-md-7" id="area_lod">
+        	<div class="col-md-12" id="area_lod">
         		<table id='table' width="100%" class="tabel black table-striped table-bordered table-hover dataTable">
 				  	<thead>
 				  		<tr>
@@ -9,6 +9,7 @@
 							<th class='thead' >Parent UK </th>   
 							<th class='thead' >Deskripsi </th>  
 							<th class='thead' >Organisasi </th>  
+							<th class='thead' >Jumlah Pegawai </th>  
 							<th class='thead' >Status </th>  
 							<th class='thead' width='200px' ># </th>	  
 				  		</tr>	 
@@ -176,8 +177,8 @@
 
  
 
-  <div class="modal effect-scale" id="mdl_modal"   role="dialog" style="z-index:5000">
-			<div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal effect-scale" id="mdl_modal" >
+			<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
 				<div class="modal-content modal-content-demo" id="area_modal">
 					<div class="modal-header">
 						<h6 class="modal-title"> </h6><button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>

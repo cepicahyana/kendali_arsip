@@ -1,12 +1,12 @@
 <?php
 $id = $this->m_reff->san($this->input->post("id"));
-$data = $this->db->get_where("ars_tr_up",array("id"=>$id))->row();
+$val = $this->db->get_where("ars_tr_up",array("id"=>$id))->row();
 
-$id = isset($data->id)?($data->id):null;
-$uuid = isset($data->uuid)?($data->uuid):"";
-$uk_uuid = isset($data->uk_uuid)?($data->uk_uuid):"";
-$description = isset($data->description)?($data->description):null;
-$organisasi_kode = isset($data->organisasi_kode)?($data->organisasi_kode):"";
+$id = isset($val->id)?($val->id):null;
+$uuid = isset($val->uuid)?($val->uuid):"";
+$uk_uuid = isset($val->uk_uuid)?($val->uk_uuid):"";
+$description = isset($val->description)?($val->description):null;
+$organisasi_kode = isset($val->organisasi_kode)?($val->organisasi_kode):"";
 ?>
 
  
@@ -22,15 +22,15 @@ $organisasi_kode = isset($data->organisasi_kode)?($data->organisasi_kode):"";
 				</div>
 				<div class="col-md-8 mg-t-5 mg-md-t-0">
 				<?php 
-				$dataray=array();
-				$dataray[""]="=== Pilih ===";
+				$valray=array();
+				$valray[""]="=== Pilih ===";
 				$db = $this->db->order_by('description','ASC');
 				$db = $this->db->get('ars_tr_uk')->result();
 				foreach($db as $v)
 				{
-					$dataray[$v->uuid]=$v->description;
+					$valray[$v->uuid]=$v->description;
 				}
-				echo form_dropdown("f[uk_uuid]",$dataray,$uk_uuid,'class="form-control select2 pb-2 text-black" style="width:100%" ');
+				echo form_dropdown("f[uk_uuid]",$valray,$uk_uuid,'class="form-control select2 pb-2 text-black" style="width:100%" ');
 				?>
 				</div>
 			</div>
@@ -40,14 +40,14 @@ $organisasi_kode = isset($data->organisasi_kode)?($data->organisasi_kode):"";
 				</div>
 				<div class="col-md-8 mg-t-5 mg-md-t-0">
 				<?php 
-				$dataray=array();
-				$dataray[""]="=== Pilih ===";
+				$valray=array();
+				$valray[""]="=== Pilih ===";
 				$db = $this->db->get('ars_tr_organisasi')->result();
 				foreach($db as $v)
 				{
-					$dataray[$v->kode]=$v->nama;
+					$valray[$v->kode]=$v->nama;
 				}
-				echo form_dropdown("f[organisasi_kode]",$dataray,$organisasi_kode,'id="organisasi" class="form-control select2 pb-2" style="width:100%" required');
+				echo form_dropdown("f[organisasi_kode]",$valray,$organisasi_kode,'id="organisasi" class="form-control select2 pb-2" style="width:100%" required');
 				?>
 				</div>
 			</div>
