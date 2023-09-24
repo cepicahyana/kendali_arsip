@@ -22,27 +22,32 @@
     <div class="modal effect-scale" id="mdl_approval" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content modal-content-demo" id="area_modal">
-                <div class="modal-header">
-                    <h6 class="modal-title"> Approve Pemusnahan</h6><button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>
-                </div>
-                <div class="modal-body">
-                    <label for="">Upload SK Kasetpres yang sudah ditandatangani:</label>
-                    <input type="file" class="form-control">
-                </div>
-                <div class="modal-body">
-                    Status Approval
-                    <div><input type="radio" name="StatusApproval" class="StatusApproval" value="1" onchange="StatusApproval(this)"> Setuju</div>
-                    <div><input type="radio" name="StatusApproval" class="StatusApproval" value="2" onchange="StatusApproval(this)"> Tidak Setuju</div>
-                    <textarea class="form-control" name="Alasan" id="Alasan" cols="30" rows="10" placeholder="Alasan" style="display: none;"></textarea>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-xs btn-primary" onclick="$('.modal').modal('hide')">Simpan</button>
-                    <button class="btn btn-xs btn-danger" onclick="$('.modal').modal('hide')">Batal</button>
-                </div>
-                <div id="response"></div>
+                <form action="javascript:submitForm('modal')" id="modal" url="<?php echo base_url() ?>ars_penyusutan/pemusnahan/update_form_approval_kasetpres" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="id" id="id">
+                    <div class="modal-header">
+                        <h6 class="modal-title"> Approve Pemusnahan</h6><button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="">Upload SK Kasetpres yang sudah ditandatangani:</label>
+                        <input type="file" class="form-control" name="attach_sk_penilaian_kasetpres" id="attach_sk_penilaian_kasetpres">
+                    </div>
+                    <div class="modal-body">
+                        Status Approval
+                        <div><input type="radio" name="StatusApproval" class="StatusApproval" value="1"> Setuju</div>
+                        <div><input type="radio" name="StatusApproval" class="StatusApproval" value="2"> Tidak Setuju</div>
+                        <textarea class="form-control" name="Alasan" id="Alasan" cols="30" rows="10" placeholder="Alasan" style="display: none;"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <button class="btn btn-xs btn-primary" onclick="$('.modal').modal('hide')">Simpan</button> -->
+                        <button onclick="submitForm('modal'); $('.modal').modal('hide')" class="btn btn-primary pd-x-30 mg-r-5 mg-t-5"><i class='fa fa-save'></i> Simpan</button>
+                        <button class="btn btn-xs btn-danger" onclick="$('.modal').modal('hide')">Batal</button>
+                    </div>
+                    <div id="response"></div>
+                </form>
             </div>
         </div>
     </div>
+
     <div class="modal effect-scale" id="mdl_pembatalan" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content modal-content-demo" id="area_modal">
@@ -60,30 +65,33 @@
             </div>
         </div>
     </div>
+
     <div class="modal effect-scale" id="mdl_uploadBA" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content modal-content-demo" id="area_modal">
-                <div class="modal-header">
-                    <h6 class="modal-title"> Upload BA</h6><button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>
-                </div>
-                <div class="modal-body">
-                    <label for="">Upload BA yang sudah ditandatangani:</label>
-                    <input type="file" class="form-control">
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-xs btn-primary" onclick="$('.modal').modal('hide')">Proses</button>
-                    <button class="btn btn-xs btn-danger" onclick="$('.modal').modal('hide')">Batal</button>
-                </div>
-                <div id="response"></div>
+                <form action="javascript:submitForm('modal-ba')" id="modal-ba" url="<?php echo base_url() ?>ars_penyusutan/pemusnahan/update_form_ba" method="post" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h6 class="modal-title"> Upload BA</h6><button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="">Upload BA yang sudah ditandatangani:</label>
+                        <input type="file" class="form-control" name="attach_sk_ba" id="attach_sk_ba">
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="submitForm('modal-ba');" class="btn btn-primary pd-x-30 mg-r-5 mg-t-5"><i class='fa fa-save'></i> Simpan</button>
+                        <button class="btn btn-xs btn-danger" onclick="$('.modal').modal('hide')">Batal</button>
+                    </div>
+                    <div id="response"></div>
+                </form>
             </div>
         </div>
     </div>
 
 
     <script type="text/javascript">
-        function StatusApproval(ini) {
-            ($(ini).val() == '1') ? $('#Alasan').hide() : $('#Alasan').show()
-        }
+        $(document).on('change', '.StatusApproval', () => {
+            ($('.StatusApproval:checked').val() == '1') ? $('#Alasan').hide(): $('#Alasan').show()
+        })
 
         function hapus(id, akun) {
             swal({
@@ -112,7 +120,7 @@
                         }
                     });
 
-                    var url = "<?php echo site_url("ars_master/hapus_tingkat_perkambangan"); ?>";
+                    var url = "<?php echo site_url("ars_penyusutan/pemusnahan/hapus_pemusnahan"); ?>";
                     var param = {
                         <?php echo $this->m_reff->tokenName() ?>: token,
                         id: id
@@ -216,13 +224,6 @@
 
 
         function action_form(id = null) {
-            // $("#mdl_modal").modal("show");
-            // $("#response").html(cantik());
-            // if (id) {
-            //     $(".modal-title").html("Update data");
-            // } else {
-            //     $(".modal-title").html("Tambah data");
-            // }
             var url = "<?php echo site_url("ars_penyusutan/pemusnahan/form_pemusnahan"); ?>";
             var param = {
                 ajax: "yes",
@@ -246,7 +247,7 @@
         }
 
         function form_penilaian_tim(id = null) {
-            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/form_penilaian_tim"); ?>";
+            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/form_penilaian_tim"); ?>/" + id;
             var param = {
                 ajax: "yes",
                 <?php echo $this->m_reff->tokenName() ?>: token,
@@ -269,30 +270,7 @@
         }
 
         function form_penilaian_anri(id = null) {
-            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/form_penilaian_anri"); ?>";
-            var param = {
-                ajax: "yes",
-                <?php echo $this->m_reff->tokenName() ?>: token,
-                id: id
-            };
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                data: param,
-                url: url,
-                success: function(data) {
-                    token = data["token"];
-                    $('.modal.aside').remove();
-                    history.replaceState(data["title"], data["title"], url);
-                    $('#bread_title').html(data["title"]);
-                    $('#bread_subtitle').html(data["subtitle"]);
-                    $(".content").html(data["data"]);
-                }
-            });
-        }
-
-        function form_penilaian_kasetpres(id = null) {
-            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/form_penilaian_kasetpres"); ?>";
+            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/form_penilaian_anri"); ?>/" + id;
             var param = {
                 ajax: "yes",
                 <?php echo $this->m_reff->tokenName() ?>: token,
@@ -315,7 +293,7 @@
         }
 
         function form_proses_pemusnahan(id = null) {
-            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/form_proses_pemusnahan"); ?>";
+            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/form_proses_pemusnahan"); ?>/" + id;
             var param = {
                 ajax: "yes",
                 <?php echo $this->m_reff->tokenName() ?>: token,
@@ -337,12 +315,32 @@
             });
         }
 
-        function approve() {
+        function form_approval_kasetpres(id = null) {
+            $('#id').val(id)
             $('#mdl_approval').modal('show');
         }
 
-        function uploadBA() {
-            $('#mdl_uploadBA').modal('show');
+        function form_ba(id = null) {
+            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/form_ba"); ?>/" + id;
+            var param = {
+                ajax: "yes",
+                <?php echo $this->m_reff->tokenName() ?>: token,
+                id: id
+            };
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                data: param,
+                url: url,
+                success: function(data) {
+                    token = data["token"];
+                    $('.modal.aside').remove();
+                    history.replaceState(data["title"], data["title"], url);
+                    $('#bread_title').html(data["title"]);
+                    $('#bread_subtitle').html(data["subtitle"]);
+                    $(".content").html(data["data"]);
+                }
+            });
         }
 
         function pembatalan() {
@@ -350,7 +348,7 @@
         }
 
         function detail(id = null) {
-            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/detail"); ?>";
+            var url = "<?php echo site_url("ars_penyusutan/pemusnahan/detail"); ?>/" + id;
             var param = {
                 ajax: "yes",
                 <?php echo $this->m_reff->tokenName() ?>: token,

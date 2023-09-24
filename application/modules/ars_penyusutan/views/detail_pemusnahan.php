@@ -1,10 +1,8 @@
 <?php
-$id = $this->m_reff->san($this->input->post("id"));
-// $data = $this->db->get_where("ars_trx_pemusnahan",array("id"=>$id))->row();
-$id = ""; //isset($data->id)?($data->id):null;
-$nomor = ""; //isset($data->nama)?($data->nama):null;
-$asal = "";
-$tujuan = array("Organisasi 1", "Organisasi 2", "Organisasi 3", "Organisasi 4");
+if (empty($refresh)) {
+	$id 	= $this->m_reff->san($this->input->post("id"));
+	$detail	= $this->mdl->getDetail($id);
+}
 ?>
 
 
@@ -26,136 +24,18 @@ $tujuan = array("Organisasi 1", "Organisasi 2", "Organisasi 3", "Organisasi 4");
 								<th class='thread text-center' width='100px'>Kurun Waktu</th>
 							</tr>
 						</thead>
-						<tbody>
-							<?php
-							for ($i = 0; $i < 9; $i++) {
-								$thn = rand(2, 5);
-								$no = $i + 1;
-								echo "<tr>";
-								echo "<td>$no</td>";
-								echo "<td>Klasifikasi $no</td>";
-								echo "<td>Uraian Arsip $no</td>";
-								echo "<td class='text-center'>$thn Tahun</td>";
-								echo "</tr>";
-							}
-							?>
-						</tbody>
 					</table>
 				</div>
 				<div class="col-xl-5 col-lg-12">
 					<h5>Informasi Pemusnahan</h5>
 					<hr class="mt-1">
 
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">Nomor Pemusnahan</label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							SETPRES/PMSN/2023/0001
-						</div>
-					</div>
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">Tanggal Register Pemusnahan </label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							<?= date('d-m-Y') ?>
-						</div>
-					</div>
-					<div class="row row-xs align-items-center mg-b-20">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">Tujuan Pemusnahan </label>
-						</div>
-						<div class="col-md-8">
-							<label class="form-label mg-b-0 text-black">UK2</label>
-						</div>
-					</div>
-					<div class="row row-xs align-items-center mg-b-20">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">Inisiator </label>
-						</div>
-						<div class="col-md-8">
-							<label class="form-label mg-b-0 text-black"><?= $this->session->userdata('username') ?></label>
-						</div>
-					</div>
-					<div class="row row-xs align-items-center mg-b-20">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">Organisasi </label>
-						</div>
-						<div class="col-md-8">
-							<label class="form-label mg-b-0 text-black">Biro Umum</label>
-						</div>
-					</div>
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">Tim Pemusnahan</label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							Pegawai 1, Pegawai 2, Pegawai 3
-						</div>
-					</div>
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">SK Tim Pemusnahan</label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							<a><i class="fa fa-download"></i></a>
-						</div>
-					</div>
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">SK Penilaian Tim Pemusnahan</label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							<a><i class="fa fa-download"></i></a>
-						</div>
-					</div>
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">Arsip Usul Musnah Tim Pemusnahan</label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							<a><i class="fa fa-download"></i></a>
-						</div>
-					</div>
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">SK Penilaian ANRI</label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							<a><i class="fa fa-download"></i></a>
-						</div>
-					</div>
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">Arsip Yang Dimusnahkan</label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							<a><i class="fa fa-download"></i></a>
-						</div>
-					</div>
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">SK Penilaian Kasetpres</label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							<a><i class="fa fa-download"></i></a>
-						</div>
-					</div>
-					<div class="row row-xs mg-b-20 align-items-center">
-						<div class="col-md-4">
-							<label class="form-label mg-b-0 text-black">BA Pemusnahan</label>
-						</div>
-						<div class="col-md-8 mg-t-5 mg-md-t-0">
-							<a><i class="fa fa-download"></i></a>
-						</div>
-					</div>
+					<?php $this->load->view('ars_penyusutan/mini_informasi_pemusnahan', $detail) ?>
 				</div>
 			</div>
 			<div align="right">
 				<hr>
 				<a href="<?= base_url(); ?>ars_penyusutan/pemusnahan"" type=" button" class="btn btn-default menuclick pd-x-30 mg-r-5 mg-t-5"><i class='fa fa-arrow-left'></i> Kembali</a>
-				<button type="button" role="button" onclick="" class="btn btn-primary pd-x-30 mg-r-5 mg-t-5"><i class='fa fa-save'></i> Simpan</button>
 			</div>
 		</form>
 	</div>
@@ -232,7 +112,7 @@ $tujuan = array("Organisasi 1", "Organisasi 2", "Organisasi 3", "Organisasi 4");
 			"sZeroRecords": "Data tidak tersedia",
 			"lengthMenu": "&nbsp;&nbsp;Tampil _MENU_ Baris",
 		},
-		// "serverSide": true,
+		"serverSide": true,
 		"responsive": true,
 		"searching": true,
 		// "lengthMenu": [
@@ -241,30 +121,40 @@ $tujuan = array("Organisasi 1", "Organisasi 2", "Organisasi 3", "Organisasi 4");
 		// ],
 		dom: 'Blfrtip',
 		buttons: [{
-			text: '<i class="fe fe-refresh-cw"></i>    ',
-			action: function(e, dt, node, config) {
-				reload_table();
+				text: '<i class="fe fe-refresh-cw"></i>    ',
+				action: function(e, dt, node, config) {
+					reload_table();
+				},
+				className: 'btn btn-secondary-light'
 			},
-			className: 'btn btn-secondary-light'
+
+			{
+				extend: 'excel',
+				text: '<i class="fe fe-download"></i>',
+				exportOptions: {
+					columns: [0, 1]
+				},
+				className: 'btn  btn-secondary-light'
+			},
+		],
+		"ajax": {
+			"url": "<?php echo site_url('ars_penyusutan/pemusnahan/getDataBerkas'); ?>",
+			"type": "POST",
+			"data": function(data) {
+				data.<?php echo $this->m_reff->tokenName() ?> = token;
+			},
+			beforeSend: function() {
+				loading("area_lod");
+			},
+			complete: function(data) {
+				token = data.responseJSON.token;
+				unblock('area_lod');
+			},
+		},
+		"columnDefs": [{
+			"targets": [], //last column
+			"orderable": false, //set not orderable
 		}, ],
-		// "ajax": {
-		//     "url": "< ?php echo site_url('ars_penyusutan/pemusnahan/getData_pemusnahan'); ?>",
-		//     "type": "POST",
-		//     "data": function(data) {
-		//         data.<?php echo $this->m_reff->tokenName() ?> = token;
-		//     },
-		//     beforeSend: function() {
-		//         loading("area_lod");
-		//     },
-		//     complete: function(data) {
-		//         token = data.responseJSON.token;
-		//         unblock('area_lod');
-		//     },
-		// },
-		// "columnDefs": [{
-		//     "targets": [], //last column
-		//     "orderable": false, //set not orderable
-		// }, ],
 	});
 </script>
 <div class="modal effect-scale" id="mdl_modal" role="dialog">
