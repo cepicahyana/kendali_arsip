@@ -1,7 +1,8 @@
 <?php
 if (empty($refresh)) {
+    $this->load->helper('s3_helper');
     $id     = $this->m_reff->san($this->input->post("id"));
-    $detail    = $this->mdl->getDetail($id);
+    $detail = $this->mdl->getDetail($id);
 }
 ?>
 <div class="row row-xs mg-b-20 align-items-center">
@@ -59,7 +60,7 @@ if (empty($refresh)) {
             <label class="form-label mg-b-0 text-black">SK Tim Pemusnahan</label>
         </div>
         <div class="col-md-8 mg-t-5 mg-md-t-0">
-            <a href="<?= base_url($detail->attach_sk_tim) ?>"><i class="fa fa-download"></i></a>
+            <a href="<?= get_s3_object($detail->attach_sk_tim, 10) ?>" class="btn btn-sm btn-info btn-file" target="_blank"><i class="fa fa-print"></i></a>
         </div>
     </div>
 <?php endif; ?>
@@ -70,18 +71,18 @@ if (empty($refresh)) {
             <label class="form-label mg-b-0 text-black">Usul musnah Awal</label>
         </div>
         <div class="col-md-8 mg-t-5 mg-md-t-0">
-            <a href="<?= base_url($detail->attach_usulmusnah_awal) ?>"><i class="fa fa-download"></i></a>
+            <a href="<?= get_s3_object($detail->attach_usulmusnah_awal, 10) ?>" class="btn btn-sm btn-info btn-file" target="_blank"><i class="fa fa-print"></i></a>
         </div>
     </div>
 <?php endif; ?>
 
-<?php if ($detail->status > 1 and !empty($detail->attach_penilaian_tim)) : ?>
+<?php if ($detail->status > 1 and !empty($detail->attach_sk_penilaian_tim)) : ?>
     <div class="row row-xs mg-b-20 align-items-center">
         <div class="col-md-4">
             <label class="form-label mg-b-0 text-black">SK Penilaian Tim Pemusnahan</label>
         </div>
         <div class="col-md-8 mg-t-5 mg-md-t-0">
-            <a href="<?= base_url($detail->attach_penilaian_tim) ?>"><i class="fa fa-download"></i></a>
+            <a href="<?= get_s3_object($detail->attach_sk_penilaian_tim, 10) ?>" class="btn btn-sm btn-info btn-file" target="_blank"><i class="fa fa-print"></i></a>
         </div>
     </div>
 <?php endif; ?>
@@ -92,18 +93,18 @@ if (empty($refresh)) {
             <label class="form-label mg-b-0 text-black">Arsip Usul Musnah Tim Pemusnahan</label>
         </div>
         <div class="col-md-8 mg-t-5 mg-md-t-0">
-            <a href="<?= base_url($detail->attach_usulmusnah_tim) ?>"><i class="fa fa-download"></i></a>
+            <a href="<?= get_s3_object($detail->attach_usulmusnah_tim, 10) ?>" class="btn btn-sm btn-info btn-file" target="_blank"><i class="fa fa-print"></i></a>
         </div>
     </div>
 <?php endif; ?>
 
-<?php if ($detail->status > 2 and !empty($detail->attach_penilaian_anri)) : ?>
+<?php if ($detail->status > 2 and !empty($detail->attach_sk_penilaian_anri)) : ?>
     <div class="row row-xs mg-b-20 align-items-center">
         <div class="col-md-4">
             <label class="form-label mg-b-0 text-black">SK Penilaian ANRI</label>
         </div>
         <div class="col-md-8 mg-t-5 mg-md-t-0">
-            <a href="<?= base_url($detail->attach_penilaian_anri) ?>"><i class="fa fa-download"></i></a>
+            <a href="<?= get_s3_object($detail->attach_sk_penilaian_anri, 10) ?>" class="btn btn-sm btn-info btn-file" target="_blank"><i class="fa fa-print"></i></a>
         </div>
     </div>
 <?php endif; ?>
@@ -114,18 +115,18 @@ if (empty($refresh)) {
             <label class="form-label mg-b-0 text-black">Arsip Yang Dimusnahkan</label>
         </div>
         <div class="col-md-8 mg-t-5 mg-md-t-0">
-            <a href="<?= base_url($detail->attach_usulmusnah_final) ?>"><i class="fa fa-download"></i></a>
+            <a href="<?= get_s3_object($detail->attach_usulmusnah_final, 10) ?>" class="btn btn-sm btn-info btn-file" target="_blank"><i class="fa fa-print"></i></a>
         </div>
     </div>
 <?php endif; ?>
 
-<?php if ($detail->status > 3 and !empty($detail->attach_penilaian_kasetpres)) : ?>
+<?php if ($detail->status > 3 and !empty($detail->attach_sk_penilaian_kasetpres)) : ?>
     <div class="row row-xs mg-b-20 align-items-center">
         <div class="col-md-4">
             <label class="form-label mg-b-0 text-black">SK Penilaian Kasetpres</label>
         </div>
         <div class="col-md-8 mg-t-5 mg-md-t-0">
-            <a><i class="fa fa-download"></i></a>
+            <a href="<?= get_s3_object($detail->attach_sk_penilaian_kasetpres, 10) ?>" class="btn btn-sm btn-info btn-file" target="_blank"><i class="fa fa-print"></i></a>
         </div>
     </div>
 <?php endif; ?>
@@ -136,7 +137,7 @@ if (empty($refresh)) {
             <label class="form-label mg-b-0 text-black">BA Pemusnahan</label>
         </div>
         <div class="col-md-8 mg-t-5 mg-md-t-0">
-            <a><i class="fa fa-download"></i></a>
+            <a href="<?= get_s3_object($detail->attach_ba, 10) ?>" class="btn btn-sm btn-info btn-file" target="_blank"><i class="fa fa-print"></i></a>
         </div>
     </div>
 <?php endif; ?>

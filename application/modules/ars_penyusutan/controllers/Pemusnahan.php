@@ -9,6 +9,7 @@ class Pemusnahan extends CI_Controller {
 		parent::__construct();	
 		$this->m_konfig->validasi_session(array("admin_arsip","up","uk"));
 		$this->load->model("pemusnahan_model","mdl");
+		$this->load->library('s3_library');
 		 
 		date_default_timezone_set('Asia/Jakarta');
 	}
@@ -90,7 +91,6 @@ class Pemusnahan extends CI_Controller {
 				$tombol .= '<button onclick="form_ba(`' . $val->id . '`,`' . $val->nomor . '`)" class="font14 btn btn-icon btn-sm ti-upload btn-info" data-toggle="tooltip" data-placement="top" title="Upload BA" type="button"></button> ';
 				$statusText = "<center><span class='badge bg-success'>Upload BA</span></center>";
 			} elseif ($val->status == 6) {
-				$tombol .= '<a target="_blank" class="font14 btn btn-icon btn-sm ti-download btn-info" data-toggle="tooltip" data-placement="top" title="Download BA" type="button"></a> ';
 				$statusText = "<center><span class='badge bg-secondary'>Selesai</span></center>";
 			} else {
 				$statusText = "<center><span class='badge bg-danger'>Gagal</span></center>";

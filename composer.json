@@ -8,6 +8,7 @@
         "mpdf/mpdf": "^8.1",
         "php-amqplib/php-amqplib": "^3.1",
         "adldap2/adldap2": "^10.3",
-        "phpoffice/phpspreadsheet": "^1.21"
+        "phpoffice/phpspreadsheet": "^1.21",
+        "aws/aws-sdk-php": "^3.281"
     }
 }

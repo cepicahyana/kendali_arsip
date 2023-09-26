@@ -10,6 +10,7 @@ class Pemusnahan_model extends CI_Model
     function __construct()
     {
         parent::__construct();
+		$this->minio = new S3_library();
     }
     function idu()
     {
@@ -184,21 +185,14 @@ class Pemusnahan_model extends CI_Model
 
 	function upload_file($param)
 	{
-		$this->load->helper('file');
+		$uuidFile 		= $this->getuuid();
+		$ext 			= pathinfo($param['file']['name'], PATHINFO_EXTENSION);
+		$imgname 		=  $param['filename'] . '_' . $uuidFile . '.' . $ext;
+		$filepathdest 	= date('Y') . '/' . date('m') . '/Pemusnahan/' . $param["uuid"] . '/';
+		$targetFile 	= $filepathdest . $imgname;
+		$result = $this->minio->uploadFilesObject($param['file']['tmp_name'], $targetFile, $filepathdest, 10);
 
-		$config['upload_path']="./file_upload/" . "pemusnahan/" . $param["uuid"] . "/"; // Folder tempat file akan disimpan
-		if(!is_dir($config['upload_path'])) {
-			mkdir($config['upload_path'], 0777, true);
-		}		
-		$config['allowed_types']="*";
-		$this->load->library('upload',$config);
-		$this->upload->initialize($config);
-
-		$this->upload->do_upload($param['file']['name']);
-		$uploaded_data = $this->upload->data();
-		$path = preg_split("(/)", $uploaded_data['full_path']);
-
-		return $uploaded_data['full_path'] . $param['file']['name'];
+		return ['targetFile' => $targetFile, 'result' => $result];
 	}
 
 	/*======= update pemusnahan =========*/
@@ -214,9 +208,9 @@ class Pemusnahan_model extends CI_Model
 		$this->db->set("tanggal", $this->input->post("tanggal"));
 
 		if (!empty($_FILES["attach_sk_tim"]["name"])) {
-			$targetFile = $this->upload_file(["file" => $_FILES["attach_sk_tim"], "filename" => "attach_sk_tim", "uuid" => $uuid]);
+			$upload = $this->upload_file(["file" => $_FILES["attach_sk_tim"], "filename" => "attach_sk_tim", "uuid" => $uuid]);
 			
-			$this->db->set("attach_sk_tim", $targetFile);
+			$this->db->set("attach_sk_tim", $upload['targetFile']);
 		}
 
 		$this->db->set("_cid",$this->session->userdata("nip"));
@@ -256,17 +250,9 @@ class Pemusnahan_model extends CI_Model
 
 		// export excel usul musnah
 		$exportExcel = $this->exportToExcel(['uuid' => $uuid, 'tipe' => 'usul_musnah_awal']);
-		$this->db->set("attach_usulmusnah_awal", $exportExcel);
+		$this->db->set("attach_usulmusnah_awal", $exportExcel['targetFile']);
 		$this->db->where("uuid", $uuid);
 		$res = $this->db->update("ars_trx_pemusnahan");
-		// echo '<pre>'; var_dump($exportExcel); die;
-        // // Redirect hasil generate xlsx ke web client
-        // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        // header('Content-Disposition: attachment;filename='.$filename);
-        // header('Cache-Control: max-age=0');
-
-        // unlink($filename);
-        // exit($content);
 
         return true;
     }
@@ -279,7 +265,6 @@ class Pemusnahan_model extends CI_Model
 
 		// update pemusnahan penilaian tim
 		$berkasJra = $this->getDataBerkasPenilaian(['uuid' => $detail->uuid, 'tipe' => 'tim_usulmusnah']);
-		// echo '<pre>'; var_dump($berkasJra); die;
 		if (!empty($berkasJra)) {
 			foreach ($berkasJra as $i => $bj) {
 				$this->penilaian(['tipe' => 'tim_ditangguhkan', 'uuid' => $bj->pemusnahan_berkas_uuid]);
@@ -288,11 +273,13 @@ class Pemusnahan_model extends CI_Model
 
 		// export excel usul musnah
 		$exportExcel = $this->exportToExcel(['uuid' => $detail->uuid, 'tipe' => 'tim_usulmusnah']);
-		$this->db->set("attach_usulmusnah_tim", $exportExcel);
+		$this->db->set("attach_usulmusnah_tim", $exportExcel['targetFile']);
+
 		// update pemusnahan
 		if (!empty($_FILES["attach_sk_penilaian_tim"]["name"])) {
-			$targetFile = $this->upload_file(["file" => $_FILES["attach_sk_penilaian_tim"], "filename" => "attach_sk_penilaian_tim", "uuid" => $detail->uuid]);
-			$this->db->set("attach_sk_penilaian_tim", $targetFile);
+			$upload = $this->upload_file(["file" => $_FILES["attach_sk_penilaian_tim"], "filename" => "attach_sk_penilaian_tim", "uuid" => $detail->uuid]);
+			
+			$this->db->set("attach_sk_penilaian_tim", $upload['targetFile']);
 		}
 		$this->db->set("status", 2); // lanjut ke penilaian anri
 		$this->db->set("_uid", $this->session->userdata("nip"));
@@ -320,11 +307,13 @@ class Pemusnahan_model extends CI_Model
 
 		// export excel usul musnah
 		$exportExcel = $this->exportToExcel(['uuid' => $detail->uuid, 'tipe' => 'anri_usulmusnah']);
-		$this->db->set("attach_usulmusnah_final", $exportExcel);
+		$this->db->set("attach_usulmusnah_final", $exportExcel['targetFile']);
+
 		// update pemusnahan
 		if (!empty($_FILES["attach_sk_penilaian_anri"]["name"])) {
-			$targetFile = $this->upload_file(["file" => $_FILES["attach_sk_penilaian_anri"], "filename" => "attach_sk_penilaian_anri", "uuid" => $detail->uuid]);
-			$this->db->set("attach_sk_penilaian_anri", $targetFile);
+			$upload = $this->upload_file(["file" => $_FILES["attach_sk_penilaian_anri"], "filename" => "attach_sk_penilaian_anri", "uuid" => $detail->uuid]);
+			
+			$this->db->set("attach_sk_penilaian_anri", $upload['targetFile']);
 		}
 		$this->db->set("status", 3); // lanjut ke penilaian kasetpres
 		$this->db->set("_uid", $this->session->userdata("nip"));
@@ -345,8 +334,9 @@ class Pemusnahan_model extends CI_Model
 
 		// update pemusnahan
 		if (!empty($_FILES["attach_sk_penilaian_kasetpres"]["name"])) {
-			$targetFile = $this->upload_file(["file" => $_FILES["attach_sk_penilaian_kasetpres"], "filename" => "attach_sk_penilaian_kasetpres", "uuid" => $detail->uuid]);
-			$this->db->set("attach_sk_penilaian_kasetpres", $targetFile);
+			$upload = $this->upload_file(["file" => $_FILES["attach_sk_penilaian_kasetpres"], "filename" => "attach_sk_penilaian_kasetpres", "uuid" => $detail->uuid]);
+			
+			$this->db->set("attach_sk_penilaian_kasetpres", $upload['targetFile']);
 		}
 
 		if ($this->input->post('StatusApproval') == 1) {
@@ -437,8 +427,9 @@ class Pemusnahan_model extends CI_Model
 
 		// update pemusnahan
 		if (!empty($_FILES["attach_ba"]["name"])) {
-			$targetFile = $this->upload_file(["file" => $_FILES["attach_ba"], "filename" => "attach_ba", "uuid" => $detail->uuid]);
-			$this->db->set("attach_ba", $targetFile);
+			$upload = $this->upload_file(["file" => $_FILES["attach_ba"], "filename" => "attach_ba", "uuid" => $detail->uuid]);
+			
+			$this->db->set("attach_ba", $upload['targetFile']);
 		}
 
 		$this->db->set("status", 6); // selesai
@@ -613,18 +604,16 @@ class Pemusnahan_model extends CI_Model
 		}
 		
 		$writer = new Xlsx($this->excel);
-		$uuid_file = $this->getuuid();
-        $filename = "daftar_berkas_{$param['tipe']}__{$uuid_file}.xlsx";
-		// $temp_file = tempnam(sys_get_temp_dir(), $filename);
-        // $writer->save($temp_file);
-		
-		$targetDir = "file_upload/" . date('Y') . "/pemusnahan/" . $param["uuid"] . "/"; // Folder tempat file akan disimpan
-		if (!file_exists($targetDir)) {
-			mkdir($targetDir, 0777, true);
-		}
-		$temp_file = $targetDir . $filename;
-        $writer->save($temp_file);
-		
-		return $temp_file;
+		$uuidFile = $this->getuuid();
+        $filename = "daftar-berkas-{$param['tipe']}_{$uuidFile}.xlsx";
+		$tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $writer->save($tempFile);
+
+		$imgname 		=  $filename;
+		$filepathdest 	= date('Y') . '/' . date('m') . '/Pemusnahan/' . $param["uuid"] . '/';
+		$targetFile 	= $filepathdest . $imgname;
+		$result = $this->minio->uploadFilesObject($tempFile, $targetFile, $filepathdest, 10);
+
+		return ['targetFile' => $targetFile, 'result' => $result];
 	}
 }
