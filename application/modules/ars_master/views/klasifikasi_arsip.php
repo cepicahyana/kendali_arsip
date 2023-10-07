@@ -1,19 +1,52 @@
     <div class="card">         
         <div class="row card-body" style='padding-top:10px;padding-bottom:20px'>
-        	<div class="col-md-12" id="area_lod">
-        		<table id='table' width="100%" class="tabel black table-striped table-bordered table-hover dataTable">
-				  	<thead>
-				  		<tr>
-				  			<th class='thead'  width='15px'>No</th>
-							<th class='thead' >Kode </th> 
-							<th class='thead' >Parent Kode </th>   
-							<th class='thead' >Nama </th>   
-							<th class='thead' >Deskripsi </th>  
-							<th class='thead' >Status </th>  
-							<th class='thead' width='200px' ># </th>	  
-				  		</tr>	 
-					</thead>
-				</table>
+			<div class="row">	
+				<div class="col-md-3">
+					<label class="form-label mg-b-0 text-black">Peraturan </label>
+					<?php 
+					$valray=array();
+					$valray[""]="=== Pilih ===";
+					$this->db->where('status',1);
+					$db = $this->db->get('ars_tr_peraturan')->result();
+					foreach($db as $v)
+					{
+						$valray[$v->id]=$v->nama;
+					}
+					echo form_dropdown("",$valray,'','id="f1" class="form-control pb-2 text-black" style="width:100%" onchange="reload_filter()"');
+					?>
+				</div>
+				<div class="col-md-3">
+					<label class="form-label mg-b-0 text-black">Level </label>
+					<?php 
+					$valray=array();
+					$valray[""]="=== Pilih ===";
+					$valray["1"]="1";
+					$valray["2"]="2";
+					$valray["3"]="3";
+					echo form_dropdown("",$valray,'','id="f2" class="form-control pb-2 text-black" style="width:100%" onchange="reload_filter()"');
+					?>
+				</div>
+			
+			
+			</div>
+			
+			<div class="row mt-3">
+				<div class="col-md-12" id="area_lod">
+					<table id='table' width="100%" class="tabel black table-striped table-bordered table-hover dataTable">
+						<thead>
+							<tr>
+								<th class='thead'  width='15px'>NO</th>
+								<th class='thead' >PERATURAN </th>
+								<th class='thead' >KODE </th> 
+								<th class='thead' >PARENT</th>   
+								<th class='thead' >NAMA </th>   
+								<th class='thead' >DESKRIPSI </th>  
+								<th class='thead' >STATUS </th>  
+								<th class='thead' width='140px' ># </th>	  
+							</tr>	 
+						</thead>
+					</table>
+				</div>
         	</div>
         </div>
 </div>	
@@ -96,27 +129,18 @@
            		reload_table();
            	},className: 'btn  btn-secondary-light'
            },
-           {  
-				extend: 'excelHtml5',
-				exportOptions: {
-					columns: [0,1,2,3,4,5]
-				},
+           {
 				text: '<i class="fe fe-download"></i>',
-				className: "btn  btn-secondary-light",
-				title: 'Master Klasifikasi Arsip',
-				messageTop: 'Export Master Klasifikasi Arsip | <?php echo date("d/m/Y H:i"); ?>',
-				filename: 'Export-Master-Klasifikasi-Arsip',
-				customize: function(xlsx) {
-					var source = xlsx.xl['workbook.xml'].getElementsByTagName('sheet')[0];
-					source.setAttribute('name', 'Master Klasifikasi Arsip');
-				}
- 			},
-        {
-        	text: '<i class="fe fe-plus"></i> Tambah ',
-        	action: function ( e, dt, node, config ) {
-        		action_form();
-        	},className: 'btn  btn-secondary-light'
-        }, 
+				action: function ( e, dt, node, config ) {
+					downloadXL();
+				},className: 'btn  btn-secondary-light'
+			},
+			{
+				text: '<i class="fe fe-plus"></i> Tambah ',
+				action: function ( e, dt, node, config ) {
+					action_form();
+				},className: 'btn  btn-secondary-light'
+			}, 
         ],
         
         "ajax": {
@@ -124,6 +148,10 @@
         	"type": "POST",
         	"data": function ( data ) {
         		data.<?php echo $this->m_reff->tokenName()?>=token;
+				data.f1=$('#f1').val();
+				data.f2=$('#f2').val();
+				//data.f3=$('#f3').val();
+				// data.f4=$('#f4').val();
         	},
         	beforeSend: function() {
         		loading("area_lod");
@@ -144,6 +172,10 @@
       function reload_table()
       {
       	dataTable.ajax.reload(null,false);	
+      };
+	  function reload_filter()
+      {
+      	dataTable.ajax.reload(null,true);	
       };
 
     
@@ -169,6 +201,35 @@
         }
       }); 
       }
+
+	//   $(function() {
+	// 	$('#f3').select2();
+	// });
+
+	//   function filter_kode(level){
+	// 	var peraturan_id = $("#f1").val();
+	// 	var url   = "<.?php echo site_url("ars_master/filter_kode_klasifikasi");?>";
+    //     var param = {<.?php echo $this->m_reff->tokenName()?>:token,level:level,peraturan_id:peraturan_id};
+    //     $.ajax({
+	// 		type: "POST",dataType: "json",data: param, url: url,
+	// 		success: function(val){
+	// 			$("#f3").html(val['data']);
+	// 			reload_filter();
+	// 			token=val['token'];
+	// 		}
+	// 	}); 
+	//   }
+
+	function downloadXL()
+		{	
+			var f1 = $('#f1').val();
+			var f2 = $('#f2').val();
+			var s = $('.whatever').val();		
+			window.open(
+			"<?php echo base_url()?>ars_master/downloadXL_klasifikasi_arsip/?s="+s+"&f1="+f1+"&f2="+f2,
+			'_blank' // <- This is what makes it open in a new window.
+			);
+		}
     </script>
 
 

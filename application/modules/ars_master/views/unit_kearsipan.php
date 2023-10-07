@@ -1,22 +1,24 @@
-    <div class="card">         
-        <div class="row card-body" style='padding-top:10px;padding-bottom:20px'>
-        	<div class="col-md-12" id="area_lod">
-        		<table id='table' width="100%" class="tabel black table-striped table-bordered table-hover dataTable">
-				  	<thead>
-				  		<tr>
-				  			<th class='thead'  width='15px'>No</th>
-							<th class='thead' >Unit Kearsipan </th> 
-							<th class='thead' >Parent UK </th>   
-							<th class='thead' >Deskripsi </th>  
-							<th class='thead' >Organisasi </th>  
-							<th class='thead' >Jumlah Pegawai </th>  
-							<th class='thead' >Status </th>  
-							<th class='thead' width='200px' ># </th>	  
-				  		</tr>	 
-					</thead>
-				</table>
-        	</div>
-        </div>
+<div class="card">         
+	<div class="row card-body" style='padding-top:10px;padding-bottom:20px'>
+		<div class="col-md-12" id="area_lod">
+
+			<table id='table' width="100%" class="tabel black table-striped table-bordered table-hover dataTable">
+				<thead>
+					<tr>
+						<th class='thead'  width='15px'>NO</th>
+						<th class='thead' width='100px'>UNIT KEARSIPAN </th> 
+						<th class='thead' width='100px'>PARENT UK </th>   
+						<th class='thead' >DESKRIPSI </th>  
+						<th class='thead' >ORGANISASI </th>  
+						<th class='thead' width='110px' >JUMLAH PEGAWAI </th>  
+						<th class='thead' >STATUS </th>  
+						<th class='thead' width='170px' ># </th>	  
+					</tr>	 
+				</thead>
+			</table>
+			
+		</div>
+	</div>
 </div>	
 						
 
@@ -91,34 +93,24 @@
         [10 ,20,30,50], ], 
         dom: 'Blfrtip',
         buttons: [
-           {
-           	text: '<i class="fe fe-refresh-cw"></i>    ',
-           	action: function ( e, dt, node, config ) {
-           		reload_table();
-           	},className: 'btn  btn-secondary-light'
-           },
-            
-           {  
-				extend: 'excelHtml5',
-				exportOptions: {
-					columns: [0,1,2,3,4,5]
-				},
+			{
+				text: '<i class="fe fe-refresh-cw"></i>',
+				action: function ( e, dt, node, config ) {
+					reload_table();
+				},className: 'btn  btn-secondary-light'
+			},
+			{
 				text: '<i class="fe fe-download"></i>',
-				className: "btn  btn-secondary-light",
-				title: 'Master Unit Kearsipan',
-				messageTop: 'Export Master Unit Kearsipan | <?php echo date("d/m/Y H:i"); ?>',
-				filename: 'Export-Master-Unit-Kearsipan',
-				customize: function(xlsx) {
-					var source = xlsx.xl['workbook.xml'].getElementsByTagName('sheet')[0];
-					source.setAttribute('name', 'Master Unit Kearsipan');
-				}
- 			},
-        {
-        	text: '<i class="fe fe-plus"></i> Tambah ',
-        	action: function ( e, dt, node, config ) {
-        		action_form();
-        	},className: 'btn  btn-secondary-light'
-        }, 
+				action: function ( e, dt, node, config ) {
+					downloadXL();
+				},className: 'btn  btn-secondary-light'
+			},
+			{
+				text: '<i class="fe fe-plus"></i> Tambah ',
+				action: function ( e, dt, node, config ) {
+					action_form();
+				},className: 'btn  btn-secondary-light'
+			}, 
         ],
         
         "ajax": {
@@ -154,30 +146,44 @@
 
       function action_form(id=null)
       {	 
-        $("#mdl_modal").modal("show");
-        $("#response").html(cantik());
-        if(id){
-          $(".modal-title").html("Update data");
-        }else{
-          $(".modal-title").html("Tambah data");
-        }
-        var url   = "<?php echo site_url("ars_master/form_unit_kearsipan");?>";
-        var param = {<?php echo $this->m_reff->tokenName()?>:token,id:id};
-        $.ajax({
-         type: "POST",dataType: "json",data: param, url: url,
-         success: function(val){
-          $("#response").html(val['data']);
-          token=val['token'];
-        }
-      }); 
+			var url = "<?= site_url('ars_master/form_unit_kearsipan')?>";
+			var title = $(this).attr("title");
+			var session = "1";
+			$("a").removeClass('active');
+			$(this).addClass('active').siblings().removeClass('active');
+			$(".content").html('<center><div style="height:100%"> <button class="btn btn-dark" type="button" disabled=""> <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading... </button></div></center>');
+            $.ajax({
+            type: "POST",
+            dataType: "json",
+            data: {ajax:"yes",<?php echo $this->m_reff->tokenName()?>:token,id:id},
+            url: url,
+            success: function(data){
+                token=data["token"];
+                $('.modal.aside').remove();
+                history.replaceState(title, title, url);
+                $('#bread_title').html(data["title"]);
+                $('#bread_subtitle').html(data["subtitle"]);
+                $(".content").html(data["data"]);
+                }
+            });
       }
+
+	  function downloadXL()
+	{	
+		// var f1 = $('#f1').val();
+		var s = $('.whatever').val();		
+		window.open(
+		  "<?php echo base_url()?>ars_master/downloadXL_unit_kearsipan/?s="+s,
+		  '_blank' // <- This is what makes it open in a new window.
+		);
+	}
     </script>
 
 
 
  
 
-  <div class="modal effect-scale" id="mdl_modal" >
+  <!-- <div class="modal effect-scale" id="mdl_modal" >
 			<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
 				<div class="modal-content modal-content-demo" id="area_modal">
 					<div class="modal-header">
@@ -187,4 +193,4 @@
 				<div id="response"></div>
 				</div>
 			</div>
-		</div>
+		</div> -->

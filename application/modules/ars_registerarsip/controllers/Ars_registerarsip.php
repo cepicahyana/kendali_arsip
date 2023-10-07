@@ -1,5 +1,7 @@
 <?php 
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Ars_registerarsip extends CI_Controller {
 
@@ -142,6 +144,143 @@ class Ars_registerarsip extends CI_Controller {
 		$id = $this->input->post("id");
 		$data = $this->mdl->getData_JRA($id);
 		$var["data"] = $data;
+		echo json_encode($var);
+	}
+
+	function download_template()
+    {
+        $this->excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+        $style_col_table = array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $style_row_table = array(
+            'alignment' => array(
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (LEFT)
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $this->excel->setActiveSheetIndex(0)->setCellValue('A1', "Template Pendataan Item Arsip");
+        $this->excel->setActiveSheetIndex(0)->setCellValue('A3', "Pengamanan");
+        $this->excel->setActiveSheetIndex(0)->setCellValue('B3', "Jenis Arsip");
+        $this->excel->setActiveSheetIndex(0)->setCellValue('C3', "Nomor");
+        $this->excel->setActiveSheetIndex(0)->setCellValue('D3', "Hal");
+        $this->excel->setActiveSheetIndex(0)->setCellValue('E3', "Tanggal Arsip");
+        $this->excel->setActiveSheetIndex(0)->setCellValue('F3', "Jenis");
+        $this->excel->setActiveSheetIndex(0)->setCellValue('G3', "Media");
+        $this->excel->setActiveSheetIndex(0)->setCellValue('H3', "Tag Item / Keywords");
+        $this->excel->setActiveSheetIndex(0)->setCellValue('I3', "Keterangan");
+        if($this->session->userdata("isoperatorarsip")){
+            $this->excel->setActiveSheetIndex(0)->setCellValue('J3', "Organisasi");
+        }
+        $this->excel->getActiveSheet()->getColumnDimension('A')->setWidth(20);
+        $this->excel->getActiveSheet()->getColumnDimension('B')->setWidth(20);
+        $this->excel->getActiveSheet()->getColumnDimension('C')->setWidth(20);
+        $this->excel->getActiveSheet()->getColumnDimension('D')->setWidth(20);
+        $this->excel->getActiveSheet()->getColumnDimension('E')->setWidth(20);
+        $this->excel->getActiveSheet()->getColumnDimension('F')->setWidth(20);
+        $this->excel->getActiveSheet()->getColumnDimension('G')->setWidth(20);
+        $this->excel->getActiveSheet()->getColumnDimension('H')->setWidth(20);
+        $this->excel->getActiveSheet()->getColumnDimension('I')->setWidth(20);
+
+        $title = 'A1:I1';
+        $th = 'A3:I3';
+        if($this->session->userdata("isoperatorarsip")){
+            $this->excel->getActiveSheet()->getColumnDimension('J')->setWidth(30);
+            $this->excel->getActiveSheet()->mergeCells('A1:J1');
+            $title = 'A1:J1';
+            $th = 'A3:J3';
+        }
+        $this->excel->getActiveSheet()->mergeCells($title);
+        $this->excel->getActiveSheet()->getStyle($th)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('f15a23');
+
+        $this->excel->getActiveSheet()->getStyle('A1:A1')->applyFromArray(array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+        ));
+
+		$writer = new Xlsx($this->excel);
+        $filename = 'Template Pendataan Item Arsip.xlsx';
+        $writer->save($filename);
+        $content = file_get_contents($filename, false);
+
+        // Redirect hasil generate xlsx ke web client
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename='.$filename);
+        header('Cache-Control: max-age=0');
+
+        unlink($filename);
+        exit($content);
+    }
+
+	function export()
+    {
+		$filename = $this->mdl->exportToPdf();
+		
+        $content = file_get_contents($filename, false);
+        // Redirect hasil generate xlsx ke web client
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename='.$filename);
+        header('Cache-Control: max-age=0');
+
+        unlink($filename);
+        exit($content);
+    }
+
+	function template_import()
+    {
+		$filename = $this->mdl->templateImport();
+		
+        $content = file_get_contents($filename, false);
+        // Redirect hasil generate xlsx ke web client
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename='.$filename);
+        header('Cache-Control: max-age=0');
+
+        unlink($filename);
+        exit($content);
+    }
+
+	function importPreview()
+    {
+        $data = array();
+        if ($_FILES['files']) {
+            $data = $this->mdl->importShow();
+        } else {
+			$data['gagal'] = true;
+			$data["info"] = "Gagal";
+            $data['item'] = [];
+			$data['status'] = 0;
+        }
+
+        echo json_encode($data);
+    }
+
+	function import(){
+		$f=$this->input->post("f");
+		if(!$f){ return $this->m_reff->page403();}
+		$var["data"] = $this->mdl->insert_import_arsip();
 		echo json_encode($var);
 	}
 }

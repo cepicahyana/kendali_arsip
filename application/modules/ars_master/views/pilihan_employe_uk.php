@@ -1,8 +1,12 @@
 <div class="row row-xs align-items-top mg-b-20">
-	<div class="col-md-4">
+	<div class="col-md-3">
 		<label class="form-label mg-b-0 text-black">Pegawai</label>
 	</div>
-	<div class="col-md-8 mg-t-5 mg-md-t-0">
+	<div class="col-md-9 mg-t-5 mg-md-t-0">
+	<?php 
+				$kd_organisasi=substr($kode_organisasi,4,2);
+				
+				?>
 		<table id="tblPegawai" class="table table-striped table-bordered table-hover" style="width:100%">
 			<thead>
 				<th>Nama Pegawai</th>
@@ -10,21 +14,28 @@
 				<th>#</th>
 			</thead>
 			<tbody id="tbody">
+				
 				<?php if($uuid){?>
 					<?php 
 					$get_emplyee=$this->db->get_where('ars_tr_uk_employee',array('uk_uuid'=>$uuid))->result();
 					$x=0;
 					foreach($get_emplyee as $em){
 						$xi=$x++;
+						$employee_uuid=$em->uuid??null;
 						$employee_nip=$em->employee_nip??null;
 						$posisi_type=$em->posisi_type??null;
+						$getnama=$this->db->get_where('data_pegawai',array('nip'=>$employee_nip))->row();
+						$employee_nama=$getnama->nama??'';
+						$employee_bagian=$getnama->bagian??'';
+						$empl_nama=$employee_nama.' ('.$employee_bagian.')';
 						?>
 
-					<tr id="R<?=$xi?>">
+					<tr id="R<?=$xi?>" >
 						<td style="width:100px">
 						<?php 
 						$valray=array();
 						$valray[""]="=== Pilih ===";
+						$this->db->where('kode_biro',$kd_organisasi);
 						$db = $this->db->get('data_pegawai')->result();
 						foreach($db as $v)
 						{
@@ -46,7 +57,7 @@
 						?>
 						</td>
 						<td style="width:10px">
-							<button type="button" class="font14 btn btn-sm ti-trash bg-danger remove"></button>
+							<button type="button" dtuuid="<?=$employee_uuid?>" dtnama="<?=$empl_nama?>" class="font14 btn btn-sm ti-trash bg-danger remove"></button>
 						</td>
 					</tr>
 					<?php }?>
@@ -56,6 +67,7 @@
 					<?php 
 					$valray=array();
 					$valray[""]="=== Pilih ===";
+					$this->db->where('kode_biro',$kd_organisasi);
 					$db = $this->db->get('data_pegawai')->result();
 					foreach($db as $v)
 					{
@@ -90,7 +102,7 @@
 <script>
 	function selectRefresh() {
 		$('.select2').select2({
-			dropdownParent: $('#mdl_modal'),
+			dropdownParent: $('#form_isi'),
 			tags: true,
 			placeholder: "=== Pilih ===",
 			allowClear: true,
@@ -111,6 +123,7 @@
 					<?php 
 					$valray=array();
 					$valray[""]="=== Pilih ===";
+					$this->db->where('kode_biro',$kd_organisasi);
 					$db = $this->db->get('data_pegawai')->result();
 					foreach($db as $v)
 					{
@@ -141,6 +154,23 @@
 
 		// jQuery button click event to remove a row.
 		$('#tbody').on('click', '.remove', function () {
+			
+			var dtuuid = $(this).attr('dtuuid');
+			var dtnama = $(this).attr('dtnama');
+			
+			if(dtuuid!=null){
+				confirm("apakah data "+dtnama+" akan dihapus ?");
+				var url   = "<?php echo site_url("ars_master/remove_employe_uk");?>";
+				var param = {<?php echo $this->m_reff->tokenName()?>:token,id: dtuuid};
+				$.ajax({
+					type: "POST",dataType: "json",data: param, url: url,
+					success: function(val){
+						token=val['token'];
+					}
+				});
+				
+			}
+
 			// Getting all the rows next to the row
 			// containing the clicked button
 			var child = $(this).closest('tr').nextAll();
@@ -149,6 +179,7 @@
 			child.each(function () {
 			// Getting <tr> id.
 			var id = $(this).attr('id');
+			
 			// Getting the <p> inside the .row-index class.
 			var idx = $(this).children('.row-index').children('p');
 			// Gets the row number from <tr> id.

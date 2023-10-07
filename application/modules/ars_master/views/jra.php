@@ -1,22 +1,39 @@
-    <div class="card">         
-        <div class="row card-body" style='padding-top:10px;padding-bottom:20px'>
-        	<div class="col-md-12" id="area_lod">
-        		<table id='table' width="100%" class="tabel black table-striped table-bordered table-hover dataTable">
-				  	<thead>
-				  		<tr>
-				  			<th class='thead'  width='15px'>No</th>
-							<th class='thead' >Nama </th> 
-							<th class='thead' >Deskripsi </th>   
-							<th class='thead' >Retensi Aktif </th>  
-							<th class='thead' >Retensi In Aktif </th>  
-							<th class='thead' >Tindak Lanjut </th>  
-							<th class='thead' >Status </th>  
-							<th class='thead' width='200px' ># </th>	  
-				  		</tr>	 
+<div class="card">         
+	<div class="row card-body" style='padding-top:10px;padding-bottom:20px'>
+		<div class="row">	
+			<div class="col-md-3">
+				<label class="form-label mg-b-0 text-black">Level </label>
+				<?php 
+				$valray=array();
+				$valray[""]="=== Pilih ===";
+				$valray["1"]="1";
+				$valray["2"]="2";
+				$valray["3"]="3";
+				echo form_dropdown("",$valray,'','id="f1" class="form-control pb-2 text-black" style="width:100%" onchange="reload_filter()"');
+				?>
+			</div>
+		</div>
+		<div class="row mt-3">
+			<div class="col-md-12" id="area_lod">
+				<table id='table' width="100%" class="tabel black table-striped table-bordered table-hover dataTable">
+					<thead>
+						<tr>
+							<th class='thead'  width='15px'>No</th>
+							<th class='thead' >KODE </th> 
+							<th class='thead' >PARENT</th> 
+							<th class='thead' >NAMA </th> 
+							<th class='thead' >DESKRIPSI </th>   
+							<th class='thead' >RETENSI AKTIF </th>  
+							<th class='thead' >RETENSI INAKTIF </th>  
+							<th class='thead' >TINDAK LANJUT </th>  
+							<th class='thead' >STATUS </th>  
+							<th class='thead' width='80px' ># </th>	  
+						</tr>	 
 					</thead>
 				</table>
-        	</div>
-        </div>
+			</div>
+		</div>
+	</div>
 </div>	
 						
 
@@ -125,6 +142,7 @@
         	"type": "POST",
         	"data": function ( data ) {
         		data.<?php echo $this->m_reff->tokenName()?>=token;
+				data.f1=$('#f1').val();
         	},
         	beforeSend: function() {
         		loading("area_lod");
@@ -145,6 +163,10 @@
       function reload_table()
       {
       	dataTable.ajax.reload(null,false);	
+      };
+	  function reload_filter()
+      {
+      	dataTable.ajax.reload(null,true);	
       };
 
     

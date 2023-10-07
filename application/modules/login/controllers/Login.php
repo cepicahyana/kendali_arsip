@@ -55,7 +55,17 @@ class Login extends MY_Controller {
  
 
 
-
+	function change_access(){
+		$link = $this->input->get("id");
+		$link = $this->m_reff->decrypt($link);
+		$link = explode("::",$link);
+		$nip = isset($link[0])?($link[0]):null;
+		$level = isset($link[1])?($link[1]):null;
+		$data =  $this->mdl->change_access($nip,$level);
+		if(isset($data["direct"])){
+			redirect($data["direct"]);
+		}
+	}
 
 	private function index_()
 	{	 

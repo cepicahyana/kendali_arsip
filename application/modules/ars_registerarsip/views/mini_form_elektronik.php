@@ -58,20 +58,8 @@
     <div class="col-md-2">
         <label class="form-label mg-b-0 text-black">Jumlah </label>
     </div>
-    <div class="col-md-6 mg-t-5 mg-md-t-0">
+    <div class="col-md-10 mg-t-5 mg-md-t-0">
         <input type="number" class="form-control" name="f[jumlah]" value="" placeholder="Jumlah">
-    </div>
-    <div class="col-md-4 mg-t-5 mg-md-t-0">
-       <?php
-        $dataray=array();
-        $dataray[""]="=== Pilih ===";
-        $data = $this->db->get("ars_tr_satuan")->result();
-        foreach($data as $db){
-            $dataray[$db->id] = $db->nama;
-        }
-        echo form_dropdown("f[satuan_id]",$dataray,"",'id="satuan" class="form-control select2 text-black" style="width:100%"');
-
-       ?>
     </div>
 </div>
 <div class="row row-xs align-items-center mg-b-20">
@@ -195,49 +183,3 @@
         </div>
     </div>
 </div>
-
-
-<script>
-    $('#periode').daterangepicker({
-    "singleDatePicker": true,
-    "showDropdowns": true,
-    "autoApply": true,
-    "locale": {
-        "format": "YYYY-MM-DD",
-        "separator": " - ",
-        "applyLabel": "Apply",
-        "cancelLabel": "Cancel",
-        "fromLabel": "From",
-        "toLabel": "To",
-        "customRangeLabel": "Custom",
-        "weekLabel": "W",
-        "daysOfWeek": [
-            "Min",
-            "Sen",
-            "Sel",
-            "Rab",
-            "Kam",
-            "Jum",
-            "Sab"
-        ],
-        "monthNames": [
-            "Januar",
-            "Februari",
-            "Maret",
-            "April",
-            "Mei",
-            "Juni",
-            "Juli",
-            "Augustus",
-            "September",
-            "Oktober",
-            "November",
-            "Desember"
-        ],
-        "firstDay": 1
-    },
- 
-}, function(start, end, label) {
-  console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
-});
-</script>

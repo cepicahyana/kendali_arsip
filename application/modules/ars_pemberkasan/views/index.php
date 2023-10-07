@@ -99,12 +99,11 @@
                     },
                     className: 'btn  btn-secondary-light'
                 },
-
                 {
                     extend: 'excel',
                     text: '<i class="fe fe-download"></i>',
-                    exportOptions: {
-                        columns: [0, 1]
+                    action: function(e, dt, node, config) {
+                        window.location = "<?php echo site_url('ars_pemberkasan/export');?>?type=1";
                     },
                     className: 'btn  btn-secondary-light'
                 },
@@ -175,12 +174,11 @@
                     },
                     className: 'btn  btn-secondary-light'
                 },
-
                 {
                     extend: 'excel',
                     text: '<i class="fe fe-download"></i>',
-                    exportOptions: {
-                        columns: [0, 1]
+                    action: function(e, dt, node, config) {
+                        window.location = "<?php echo site_url('ars_pemberkasan/export');?>?type=0";
                     },
                     className: 'btn  btn-secondary-light'
                 },

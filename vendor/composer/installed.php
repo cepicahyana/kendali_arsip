@@ -1,24 +1,24 @@
 <?php return array (
   'root' => 
   array (
-    'pretty_version' => '1.0.0+no-version-set',
-    'version' => '1.0.0.0',
+    'pretty_version' => 'dev-master',
+    'version' => 'dev-master',
     'aliases' => 
     array (
     ),
-    'reference' => NULL,
+    'reference' => '45e0c2ceccb49cbe79314418539489a37585006f',
     'name' => '__root__',
   ),
   'versions' => 
   array (
     '__root__' => 
     array (
-      'pretty_version' => '1.0.0+no-version-set',
-      'version' => '1.0.0.0',
+      'pretty_version' => 'dev-master',
+      'version' => 'dev-master',
       'aliases' => 
       array (
       ),
-      'reference' => NULL,
+      'reference' => '45e0c2ceccb49cbe79314418539489a37585006f',
     ),
     'adldap2/adldap2' => 
     array (
@@ -29,6 +29,24 @@
       ),
       'reference' => '81aeb283f56e216ae925a9cc4241de56b1fd4453',
     ),
+    'aws/aws-crt-php' => 
+    array (
+      'pretty_version' => 'v1.2.2',
+      'version' => '1.2.2.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '2f1dc7b7eda080498be96a4a6d683a41583030e9',
+    ),
+    'aws/aws-sdk-php' => 
+    array (
+      'pretty_version' => '3.282.0',
+      'version' => '3.282.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '79a3ed5bb573f592823f8b1cffe0dbac3132e6b4',
+    ),
     'ezyang/htmlpurifier' => 
     array (
       'pretty_version' => 'v4.14.0',
@@ -37,6 +55,33 @@
       array (
       ),
       'reference' => '12ab42bd6e742c70c0a52f7b82477fcd44e64b75',
+    ),
+    'guzzlehttp/guzzle' => 
+    array (
+      'pretty_version' => '7.8.0',
+      'version' => '7.8.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '1110f66a6530a40fe7aea0378fe608ee2b2248f9',
+    ),
+    'guzzlehttp/promises' => 
+    array (
+      'pretty_version' => '2.0.1',
+      'version' => '2.0.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '111166291a0f8130081195ac4556a5587d7f1b5d',
+    ),
+    'guzzlehttp/psr7' => 
+    array (
+      'pretty_version' => '1.9.1',
+      'version' => '1.9.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'e4490cabc77465aaee90b20cfc9a770f8c04be6b',
     ),
     'illuminate/contracts' => 
     array (
@@ -82,6 +127,15 @@
       array (
       ),
       'reference' => 'a8a22f4874157e490d41b486053a20bec42e182c',
+    ),
+    'mtdowling/jmespath.php' => 
+    array (
+      'pretty_version' => '2.7.0',
+      'version' => '2.7.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'bbb69a935c2cbb0c03d7f481a238027430f6440b',
     ),
     'myclabs/deep-copy' => 
     array (
@@ -177,6 +231,13 @@
       ),
       'reference' => '2dfb5f6c5eff0e91e20e913f8c5452ed95b86621',
     ),
+    'psr/http-client-implementation' => 
+    array (
+      'provided' => 
+      array (
+        0 => '1.0',
+      ),
+    ),
     'psr/http-factory' => 
     array (
       'pretty_version' => '1.0.1',
@@ -194,6 +255,13 @@
       array (
       ),
       'reference' => 'f6561bf28d520154e4b0ec72be95418abe6d9363',
+    ),
+    'psr/http-message-implementation' => 
+    array (
+      'provided' => 
+      array (
+        0 => '1.0',
+      ),
     ),
     'psr/log' => 
     array (
@@ -213,6 +281,15 @@
       ),
       'reference' => '408d5eafb83c57f6365a3ca330ff23aa4a5fa39b',
     ),
+    'ralouphie/getallheaders' => 
+    array (
+      'pretty_version' => '3.0.3',
+      'version' => '3.0.3.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '120b605dfeb996808c31b6477290a714d356e822',
+    ),
     'setasign/fpdi' => 
     array (
       'pretty_version' => 'v2.3.6',
@@ -221,6 +298,15 @@
       array (
       ),
       'reference' => '6231e315f73e4f62d72b73f3d6d78ff0eed93c31',
+    ),
+    'symfony/deprecation-contracts' => 
+    array (
+      'pretty_version' => 'v2.5.2',
+      'version' => '2.5.2.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'e8b495ea28c1d97b5e0c121748d6f9b53d075c66',
     ),
     'symfony/polyfill-mbstring' => 
     array (

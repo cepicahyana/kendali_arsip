@@ -6,7 +6,7 @@ class Ars_pemberkasan extends CI_Controller {
 	function __construct()
 	{
 		parent::__construct();
-		$this->m_konfig->validasi_session(array("admin_arsip","uk","up"));
+		$this->m_konfig->validasi_session(array("admin_arsip"));
 		$this->load->model("model","mdl");
 		date_default_timezone_set('Asia/Jakarta');
 	}
@@ -51,7 +51,7 @@ class Ars_pemberkasan extends CI_Controller {
 			$row[] = $val->kka;
 			$row[] = $val->uraian_informasi;
 			$row[] = $val->kurun_waktu;
-			$row[] = "";
+			$row[] = $val->tingkat_perkembangan;
 			$row[] = "";
 			$row[] = "";
 			if ($this->input->post('type') == 0) {
@@ -97,7 +97,7 @@ class Ars_pemberkasan extends CI_Controller {
 			$row[] = $val->kka;
 			$row[] = ($val->jenis == 1) ? "Arsip Konvensial" : (($val->jenis == 2) ? "Arsip Elektronik" : "Arsip Audio Visual");
 			$row[] = $val->kurun_waktu;
-			$row[] = "";
+			$row[] = $val->tingkat_perkembangan;
 			
 			$row[] = $checkbox;
 			$data[] = $row; 
@@ -150,5 +150,19 @@ class Ars_pemberkasan extends CI_Controller {
 		$var["data"] = $data;
 		echo json_encode($var);
 	}
+
+	function export()
+    {
+		$filename = $this->mdl->exportToPdf();
+		
+        $content = file_get_contents($filename, false);
+        // Redirect hasil generate xlsx ke web client
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename='.$filename);
+        header('Cache-Control: max-age=0');
+
+        unlink($filename);
+        exit($content);
+    }
 	 
 }

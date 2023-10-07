@@ -97,7 +97,7 @@ $autoload['helper'] = array('html','url','form');
 | config files.  Otherwise, leave it blank.
 |
 */
-$autoload['config'] = array();
+$autoload['config'] = array('s3');
 
 /*
 | -------------------------------------------------------------------

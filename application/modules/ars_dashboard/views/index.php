@@ -7,6 +7,7 @@
 										 
 										<div class="col-md mg-t-10 mg-md-t-0">&nbsp;
 											<button class="btn btn-primary btn-block "><i class=" fa fa-search"></i> Cari</button>
+											<br>
 										</div>
 									</div>
 								</div>

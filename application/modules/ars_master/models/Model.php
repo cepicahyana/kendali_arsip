@@ -162,7 +162,8 @@ class Model extends CI_Model  {
                                     'status' => 1,
                                     'uk_uuid' => $uuid
                                 );
-                            }else{
+                            }
+                            if($ceks==0){
                                 $arr2_data[]  = array(
                                     'employee_nip' => $value,
                                     'posisi_type' => $v,
@@ -174,10 +175,10 @@ class Model extends CI_Model  {
                     }
                 }
             }
-            if($arr1_data!=array()){
+            if(count($arr1_data)!=0){
                 $this->db->update_batch("ars_tr_uk_employee",$arr1_data,'employee_nip');
             }
-            if($arr2_data!=array()){
+            if(count($arr2_data)!=0){
                 $this->db->insert_batch("ars_tr_uk_employee",$arr2_data);
             }
             $this->m_reff->log("update data unit kearsipan");
@@ -214,7 +215,7 @@ class Model extends CI_Model  {
                     }
                 }
             }
-            if($arr1_data!=array()){
+            if(count($arr1_data)!=0){
                 $this->db->insert_batch("ars_tr_uk_employee",$arr1_data);
             }
             $this->m_reff->log("menambahkan data unit kearsipan");
@@ -225,8 +226,8 @@ class Model extends CI_Model  {
     function hapus_unit_kearsipan(){
         $id = $this->input->post("id");
         $this->db->where("uuid",$id);
-        $hapusUK=$this->db->delete("ars_tr_uk");
-        if($hapusUK){
+        $hapus=$this->db->delete("ars_tr_uk");
+        if($hapus){
             $this->db->where("uk_uuid",$id);
             return $this->db->delete("ars_tr_uk_employee");
         }
@@ -269,12 +270,16 @@ class Model extends CI_Model  {
 	}
 
     function update_unit_pengelola(){
-        $id = $this->input->post("id");
+        $uuid = $this->input->post("uuid");
         $form = $this->input->post("f");
         $type=$this->input->post("f[type]");
+        $nip_pegawai = $this->input->post("nip_pegawai[]");
+        $posisi = $this->input->post("posisi[]");
+        
+        $form = $this->input->post("f");
         $this->db->set($form);
-        if($id){
-            // $get=$this->db->get_where("ars_tr_up",array("id"=>$id))->row();
+        if($uuid){
+            // $get=$this->db->get_where("ars_tr_up",array("uuid"=>$uuid))->row();
             // $type_b=$get->type??'';
             // $cek=$this->db->get_where("ars_tr_up",array("type!="=>$type_b,"type"=>$type))->num_rows();
             // if($cek){
@@ -285,8 +290,41 @@ class Model extends CI_Model  {
             // }
             $this->db->set("_uid",$this->session->userdata("nip"));
             $this->db->set("_utime",date('Y-m-d H:i:s'));
-            $this->db->where("id",$id);
+            $this->db->where("uuid",$uuid);
             $this->db->update("ars_tr_up");
+
+            $arr1_data=array();
+            $arr2_data=array();
+            foreach($nip_pegawai as $key=>$value) {
+                if($value){
+                    foreach($posisi as $k=>$v) {
+                        if($key==$k){
+                            $ceks=$this->db->get_where("ars_tr_up_employee",array("employee_nip="=>$value,"up_uuid"=>$uuid))->num_rows();
+                            if($ceks){
+                                $arr1_data[]  = array(
+                                    'employee_nip' => $value,
+                                    'posisi_type' => $v,
+                                    'status' => 1,
+                                    'up_uuid' => $uuid
+                                );
+                            }else{
+                                $arr2_data[]  = array(
+                                    'employee_nip' => $value,
+                                    'posisi_type' => $v,
+                                    'status' => 1,
+                                    'up_uuid' => $uuid
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+            if(count($arr1_data)!=0){
+                $this->db->update_batch("ars_tr_up_employee",$arr1_data,'employee_nip');
+            }
+            if(count($arr2_data)!=0){
+                $this->db->insert_batch("ars_tr_up_employee",$arr2_data);
+            }
             $this->m_reff->log("update data unit pengelola");
         }else{
             // if($type==1){
@@ -302,6 +340,28 @@ class Model extends CI_Model  {
             $this->db->set("_cid",$this->session->userdata("nip"));
             $this->db->set("_ctime",date('Y-m-d H:i:s'));
             $this->db->insert("ars_tr_up");
+
+            $guk=$this->db->order_by('id','DESC');
+            $guk=$this->db->get("ars_tr_up")->row();
+            $up_uuid=$guk->uuid??null;
+            $arr1_data=array();
+            foreach($nip_pegawai as $key=>$value) {
+                if($value){
+                    foreach($posisi as $k=>$v) {
+                        if($key==$k){
+                            $arr1_data[]  = array(
+                                'employee_nip' => $value,
+                                'posisi_type' => $v,
+                                'status' => 1,
+                                'up_uuid' => $up_uuid
+                            );
+                        }
+                    }
+                }
+            }
+            if(count($arr1_data)!=0){
+                $this->db->insert_batch("ars_tr_up_employee",$arr1_data);
+            }
             $this->m_reff->log("menambahkan data unit pengelola");
         }
         return true;
@@ -309,8 +369,12 @@ class Model extends CI_Model  {
 
     function hapus_unit_pengelola(){
         $id = $this->input->post("id");
-        $this->db->where("id",$id);
-        return $this->db->delete("ars_tr_up");
+        $this->db->where("uuid",$id);
+        $hapus=$this->db->delete("ars_tr_up");
+        if($hapus){
+            $this->db->where("up_uuid",$id);
+            return $this->db->delete("ars_tr_up_employee");
+        }
     }
 
 
@@ -325,14 +389,29 @@ class Model extends CI_Model  {
 	}
 	function _getData_KlasifikasiArsip()
 	{
-		  
+		$f1=$this->input->post('f1');
+		$f2=$this->input->post('f2');
+		$f3=$this->input->post('f3');
+		// $f4=$this->input->post('f4');
+        if($f1){
+            $this->db->where('peraturan_id',$f1);
+        }
+        if($f2){
+            $this->db->where('level',$f2);
+        }
+        if($f3){
+            $this->db->where('kode',$f3);
+        }
+        // if($f4){
+        //     $this->db->where('kode',$f4);
+        // }
 		    if (strlen(isset($_POST['search']['value'])?($_POST['search']['value']):null)>=1) {
                 $searchkey = $_POST['search']['value'];
                 $searchkey = $this->m_reff->sanitize($searchkey);
 				$query=array(
+                    "kode"=>$searchkey,
                     "nama"=>$searchkey,
 				    "deskripsi"=>$searchkey,
-                 
 				);
 				$this->db->group_start()
                         ->or_like($query)
@@ -353,28 +432,20 @@ class Model extends CI_Model  {
         $uuid = $this->input->post("uuid");
         $form = $this->input->post("f");
         $level=$this->input->post("f[level]");
+        $parent_kode=$this->input->post("parent_kode");
+        $peraturan_id=$this->input->post("f[peraturan_id]");
+        $kode=$this->input->post("f[kode]");
 
-        $parent_kode=$this->input->post("parent_kode".$level."");;
-        $kode=$this->input->post("kode".$level."");
-        $nama=$this->input->post("nama".$level."");
-        $deskripsi=$this->input->post("deskripsi".$level."");
-
-        if($parent_kode){
-            $parent_kode=$parent_kode;
-        }else{
+        if(!$parent_kode){
             $parent_kode=null;
         }
 
-        $this->db->set("parent_kode",$parent_kode);
-        $this->db->set("kode",$kode);
-        $this->db->set("nama",$nama);
-        $this->db->set("deskripsi",$deskripsi);
-        
+        $this->db->set('parent_kode',$parent_kode);
         $this->db->set($form);
         if($uuid){
             $get=$this->db->get_where("ars_tr_kka",array("uuid"=>$uuid))->row();
             $kode_b=$get->kode??'';
-            $cek=$this->db->get_where("ars_tr_kka",array("level"=>$level,"kode!="=>$kode_b,"kode"=>$kode))->num_rows();
+            $cek=$this->db->get_where("ars_tr_kka",array("peraturan_id"=>$peraturan_id,"level"=>$level,"kode!="=>$kode_b,"kode"=>$kode))->num_rows();
             if($cek){
                 $var["gagal"]=true;
                 $var["info"]="kode klasifikasi arsip sudah ada";
@@ -387,7 +458,7 @@ class Model extends CI_Model  {
             $this->db->update("ars_tr_kka");
             $this->m_reff->log("update data klasifikasi arsip ");
         }else{
-            $cek=$this->db->get_where("ars_tr_kka",array("level"=>$level,"kode"=>$kode))->num_rows();
+            $cek=$this->db->get_where("ars_tr_kka",array("peraturan_id"=>$peraturan_id,"level"=>$level,"kode"=>$kode))->num_rows();
             if($cek){
                 $var["gagal"]=true;
                 $var["info"]="kode klasifikasi arsip sudah ada";
@@ -408,6 +479,97 @@ class Model extends CI_Model  {
         $this->db->where("uuid",$id);
         return $this->db->delete("ars_tr_kka");
         
+    }
+
+    /*======= JRA =========----------------------------------------------------------------------------*/
+	function getData_jra()
+	{
+		 $this->_getData_jra();
+		if($this->m_reff->san($this->input->post("length")!=-1)) 
+		$this->db->limit($this->m_reff->san($this->input->post("length")),$this->m_reff->san($this->input->post("start")));
+	 	return $this->db->get()->result();
+		 
+	}
+	function _getData_jra()
+	{
+        $f1=$this->input->post('f1');
+        if($f1){
+            $this->db->where('level',$f1);
+        }
+        if (strlen(isset($_POST['search']['value'])?($_POST['search']['value']):null)>=1) {
+            $searchkey = $_POST['search']['value'];
+            $searchkey = $this->m_reff->sanitize($searchkey);
+            $query=array(
+            "kode"=>$searchkey,
+            "nama"=>$searchkey,
+            "deskripsi"=>$searchkey
+            );
+            $this->db->group_start()
+                    ->or_like($query)
+            ->group_end();
+            
+        }		 
+		$query=$this->db->from("ars_tr_jra");
+		return $query;
+	}
+	
+	public function count_jra()
+	{				
+			$this->_getData_jra();
+		return $this->db->get()->num_rows();
+	}
+
+    function update_jra(){
+        $uuid = $this->input->post("uuid");
+        $form = $this->input->post("f");
+        $type=$this->input->post("f[type]");
+        $level=$this->input->post("f[level]");
+        $parent_kode=$this->input->post("parent_kode");
+        $kode=$this->input->post("f[kode]");
+
+        if(!$parent_kode){
+            $parent_kode=null;
+        }
+
+        $this->db->set('parent_kode',$parent_kode);
+        $this->db->set($form);
+        if($uuid){
+            $get=$this->db->get_where("ars_tr_jra",array("uuid"=>$uuid))->row();
+            $kode_b=$get->kode??'';
+            $cek=$this->db->get_where("ars_tr_jra",array("level"=>$level,"kode!="=>$kode_b,"kode"=>$kode))->num_rows();
+            if($cek){
+                $var["gagal"]=true;
+                $var["info"]="kode jarak retensi arsip sudah ada";
+                $var["token"]=$this->m_reff->getToken();
+                return $var;
+            }
+
+            $this->db->set("_uid",$this->session->userdata("nip"));
+            $this->db->set("_utime",date('Y-m-d H:i:s'));
+            $this->db->where("uuid",$uuid);
+            $this->db->update("ars_tr_jra");
+            $this->m_reff->log("update data jarak retensi arsip");
+        }else{
+            $cek=$this->db->get_where("ars_tr_jra",array("level"=>$level,"kode"=>$kode))->num_rows();
+            if($cek){
+                $var["gagal"]=true;
+                $var["info"]="kode jarak retensi arsip sudah ada";
+                $var["token"]=$this->m_reff->getToken();
+                return $var;
+            }
+            $this->db->set('status',1);
+            $this->db->set("_cid",$this->session->userdata("nip"));
+            $this->db->set("_ctime",date('Y-m-d H:i:s'));
+            $this->db->insert("ars_tr_jra");
+            $this->m_reff->log("menambahkan data jarak retensi arsip");
+        }
+        return true;
+    }
+
+    function hapus_jra(){
+        $id = $this->input->post("id");
+        $this->db->where("uuid",$id);
+        return $this->db->delete("ars_tr_jra");
     }
 
 
@@ -631,86 +793,7 @@ class Model extends CI_Model  {
 
 
 
-    /*======= JRA =========----------------------------------------------------------------------------*/
-	function getData_jra()
-	{
-		 $this->_getData_jra();
-		if($this->m_reff->san($this->input->post("length")!=-1)) 
-		$this->db->limit($this->m_reff->san($this->input->post("length")),$this->m_reff->san($this->input->post("start")));
-	 	return $this->db->get()->result();
-		 
-	}
-	function _getData_jra()
-	{
-		  
-		    if (strlen(isset($_POST['search']['value'])?($_POST['search']['value']):null)>=1) {
-                $searchkey = $_POST['search']['value'];
-                $searchkey = $this->m_reff->sanitize($searchkey);
-				$query=array(
-
-				"nama"=>$searchkey,
-				"deskripsi"=>$searchkey
-                 
-				);
-				$this->db->group_start()
-                        ->or_like($query)
-                ->group_end();
-				
-			}		 
-		$query=$this->db->from("ars_tr_jra");
-		return $query;
-	}
-	
-	public function count_jra()
-	{				
-			$this->_getData_jra();
-		return $this->db->get()->num_rows();
-	}
-
-    function update_jra(){
-        $uuid = $this->input->post("uuid");
-        $form = $this->input->post("f");
-        $type=$this->input->post("f[type]");
-        $this->db->set($form);
-        if($uuid){
-            // $get=$this->db->get_where("ars_tr_jra",array("id"=>$id))->row();
-            // $type_b=$get->type??'';
-            // $cek=$this->db->get_where("ars_tr_jra",array("type!="=>$type_b,"type"=>$type))->num_rows();
-            // if($cek){
-            //     $var["gagal"]=true;
-            //     $var["info"]="Unit Kearsipan I sudah ada";
-            //     $var["token"]=$this->m_reff->getToken();
-            //     return $var;
-            // }
-            $this->db->set("_uid",$this->session->userdata("nip"));
-            $this->db->set("_utime",date('Y-m-d H:i:s'));
-            $this->db->where("uuid",$uuid);
-            $this->db->update("ars_tr_jra");
-            $this->m_reff->log("update data jarak retensi arsip");
-        }else{
-            // if($type==1){
-            //     $cek=$this->db->get_where("ars_tr_jra",array("type"=>1))->num_rows();
-            //     if($type){
-            //         $var["gagal"]=true;
-            //         $var["info"]="Unit Kearsipan I sudah ada";
-            //         $var["token"]=$this->m_reff->getToken();
-            //         return $var;
-            //     }
-            // }
-            $this->db->set('status',1);
-            $this->db->set("_cid",$this->session->userdata("nip"));
-            $this->db->set("_ctime",date('Y-m-d H:i:s'));
-            $this->db->insert("ars_tr_jra");
-            $this->m_reff->log("menambahkan data jarak retensi arsip");
-        }
-        return true;
-    }
-
-    function hapus_jra(){
-        $id = $this->input->post("id");
-        $this->db->where("uuid",$id);
-        return $this->db->delete("ars_tr_jra");
-    }
+    
 
 
 

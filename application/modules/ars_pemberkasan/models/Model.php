@@ -1,4 +1,6 @@
 <?php
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Model extends CI_Model  {
     
@@ -78,9 +80,10 @@ class Model extends CI_Model  {
                 ->group_end();
 				
 			}		 
-		$this->db->select("a.*, CONCAT(kka.kode, ' - ', kka.nama) as kka");
+		$this->db->select("a.*, CONCAT(kka.kode, ' - ', kka.nama) as kka, tp.nama as tingkat_perkembangan");
 		$this->db->where('a.status', $this->input->post('type'));
-		$this->db->join("ars_tr_kka kka","a.kka_kode = kka.kode");
+		$this->db->join("ars_tr_kka kka","a.kka_kode = kka.kode", "left");
+		$this->db->join("ars_tr_tingkat_perkembangan tp","a.tingkat_perkembangan_id = tp.id", "left");
 		$query=$this->db->from("ars_trx_berkas a");
 		return $query;
 	}
@@ -114,8 +117,9 @@ class Model extends CI_Model  {
                 ->group_end();
 				
 			}		 
-		$this->db->select("a.*, CONCAT(kka.kode, ' - ', kka.nama) as kka");
-		$this->db->join("ars_tr_kka kka","a.kka_kode = kka.kode");
+		$this->db->select("a.*, CONCAT(kka.kode, ' - ', kka.nama) as kka, tp.nama as tingkat_perkembangan");
+		$this->db->join("ars_tr_kka kka","a.kka_kode = kka.kode", "left");
+		$this->db->join("ars_tr_tingkat_perkembangan tp","a.tingkat_perkembangan_id = tp.id", "left");
 		$this->db->where('kka_kode', $this->input->post('kka'));
 		$query=$this->db->from("ars_trx_arsip a");
 		return $query;
@@ -185,6 +189,108 @@ class Model extends CI_Model  {
 		$query = "SELECT UUID() as datauuid";
         $v =  $this->db->query($query)->row_array();
         return $v['datauuid'];
+	}
+
+	function exportToPdf(){
+		$this->db->select("a.*, CONCAT(kka.kode, ' - ', kka.nama) as kka, tp.nama as tingkat_perkembangan, (select COUNT(*) from ars_trx_arsip where folder_uuid = a.uuid) as total_arsip");
+		$this->db->join("ars_tr_kka kka","a.kka_kode = kka.kode", "left");
+		$this->db->join("ars_tr_tingkat_perkembangan tp","a.tingkat_perkembangan_id = tp.id", "left");
+		$this->db->where('a.status', $this->input->get('type'));
+		$this->db->from("ars_trx_berkas a");
+		$data = $this->db->get()->result();
+		
+		$this->excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+        $style_col_table = array(
+            'font' => array('bold' => true, 'color' => array('rgb' => 'FFFFFF')), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+
+        $style_row_table = array(
+            'alignment' => array(
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (LEFT)
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+            'borders' => array(
+                'top' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN), // Set border top dengan garis tipis
+                'right' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN),  // Set border right dengan garis tipis
+                'bottom' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN), // Set border bottom dengan garis tipis
+                'left' => array('borderStyle'  => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN) // Set border left dengan garis tipis
+            )
+        );
+		$this->excel->setActiveSheetIndex(0)->setCellValue('A1', "Daftar Berkas");
+		$this->excel->setActiveSheetIndex(0)->setCellValue('A3', "No");
+		$this->excel->setActiveSheetIndex(0)->setCellValue('B3', "Klasifikasi Arsip");
+		$this->excel->setActiveSheetIndex(0)->setCellValue('C3', "Uraian Informasi Arsip");
+		$this->excel->setActiveSheetIndex(0)->setCellValue('D3', "Kurun Waktu");
+		$this->excel->setActiveSheetIndex(0)->setCellValue('E3', "Tingkat Perkembangan");
+		$this->excel->setActiveSheetIndex(0)->setCellValue('F3', "Jumlah");
+		$this->excel->setActiveSheetIndex(0)->setCellValue('G3', "Ket");
+
+		$column = range('A','G');
+        $title = 'A1:G1';
+        $th = 'A3:G3';
+
+		foreach($column as $columnID) {
+			$this->excel->getActiveSheet()->getColumnDimension($columnID)
+				->setWidth(20);
+			$this->excel->getActiveSheet()->getStyle($columnID . '3:' . $columnID . '3')
+				->applyFromArray($style_col_table)->applyFromArray($style_row_table);
+		}
+        $this->excel->getActiveSheet()->mergeCells($title);
+        $this->excel->getActiveSheet()->getStyle($th)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('8DB4E2');
+
+        $this->excel->getActiveSheet()->getStyle('A1:A1')->applyFromArray(array(
+            'font' => array('bold' => true), // Set font nya jadi bold
+            'alignment' => array(
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, // Set text jadi ditengah secara horizontal (center)
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER // Set text jadi di tengah secara vertical (middle)
+            ),
+        ));
+
+		$numrow = 4;
+		if (count($data) > 0) {
+			foreach ($data as $key => $val) {
+				$this->excel->setActiveSheetIndex(0)
+					->setCellValue('A' . $numrow, $key + 1)
+					->setCellValue('B' . $numrow, $val->kka ? $val->kka : '-')
+					->setCellValue('C' . $numrow, $val->uraian_informasi ? $val->uraian_informasi : '-')
+					->setCellValue('D' . $numrow, $val->kurun_waktu ? $val->kurun_waktu : '-')
+					->setCellValue('E' . $numrow, $val->tingkat_perkembangan ? $val->tingkat_perkembangan : '-')
+					->setCellValue('F' . $numrow, '-')
+					->setCellValue('G' . $numrow, '-');
+
+
+				foreach (range('A', $column[array_key_last($column)]) as $columnID) {
+					$this->excel->getActiveSheet()->getStyle($columnID . $numrow)->applyFromArray($style_row_table);
+					$this->excel->getActiveSheet()->getStyle($column[array_key_last($column)] . $numrow)->getAlignment()->setWrapText(true);
+				}
+				$numrow++;
+			}
+		} else {
+			$this->excel->setActiveSheetIndex(0)->setCellValue('A'. $numrow, "Data Tidak Ditemukan");
+			$this->excel->getActiveSheet()->mergeCells('A' . $numrow . ':' . $column[array_key_last($column)] . $numrow);
+			$this->excel->getActiveSheet()->getStyle('A' . $numrow . ':' . $column[array_key_last($column)] . $numrow)->applyFromArray($style_row_table);
+		}
+
+		foreach (range('A', $column[array_key_last($column)]) as $columnID) {
+			$this->excel->getActiveSheet()->getColumnDimension($columnID)->setAutoSize(true);
+		}
+
+		$writer = new Xlsx($this->excel);
+		$status = $this->input->get('type') == 1 ? "Aktif" : "InAktif";
+        $filename = 'Daftar Item Berkas ' . $status . '.xlsx';
+        $writer->save($filename);
+		return $filename;
 	}
 }
 

@@ -123,6 +123,97 @@ class M_login extends CI_Model  {
 				  $this->session->set_userdata("nip",$nip); 
 				//   $nip	=  $this->session->userdata("nip");
 				if(!$nip){	redirect("login/logout"); 		}
+
+
+
+					///arsip UK
+					$uk = $this->db->get_where("ars_tr_uk_employee",array("employee_nip"=>$nip))->row();
+					if(isset($uk->id)){
+						$data 	   = $this->db->get_where("data_pegawai",array("nip"=>$nip))->row();
+						$id 	   = isset($data->id)?($data->id):null;
+						$kode_biro = isset($data->kode_biro)?($data->kode_biro):null;
+						$kode_istana = isset($data->kode_istana)?($data->kode_istana):null;
+						$username = isset($data->username)?($data->username):null;
+
+
+						$posisi  = isset($uk->posisi_type)?($uk->posisi_type):null;
+						$uk_uuid = isset($uk->uk_uuid)?($uk->uk_uuid):null;
+						$tr_uk = $this->m_reff->goField("ars_tr_uk","type","where uuid='".$uk_uuid."' ");
+						if($tr_uk==01){
+							$uk = "I";
+						}elseif($tr_uk==02){
+							$uk = "II";
+						}elseif($tr_uk==03){
+							$uk = "III";
+						}
+	
+							if($data->jk=="l"){
+								$this->session->set_userdata("gender","cowok");
+							}else{
+								$this->session->set_userdata("gender","cewek");
+							}
+							$this->session->set_userdata("id",$id);
+							$this->session->set_userdata("kode_biro",$kode_biro );
+							$this->session->set_userdata("kode_istana",$kode_istana);
+							$this->session->set_userdata("username",$username);
+							$this->session->set_userdata("level","up");
+							$this->session->set_userdata("id_level",16);
+							$this->session->set_userdata("level_ket","Unit Kearsipan - $uk ");
+							$this->session->set_userdata("posisi",$posisi);
+							$this->session->set_userdata("uk",$uk);
+							$this->m_reff->log("Login");
+							$var["sts"] = true;
+							$var["direct"] = "ars_dashboard";
+							return $var;
+						}
+						///END UK
+
+
+
+///arsip UP
+$uk = $this->db->get_where("ars_tr_up_employee",array("employee_nip"=>$nip))->row();
+if(isset($uk->id)){
+	$data 	   = $this->db->get_where("data_pegawai",array("nip"=>$nip))->row();
+	$id 	   = isset($data->id)?($data->id):null;
+	$kode_biro = isset($data->kode_biro)?($data->kode_biro):null;
+	$kode_istana = isset($data->kode_istana)?($data->kode_istana):null;
+	$username = isset($data->username)?($data->username):null;
+
+
+	$posisi = isset($uk->posisi_type)?($uk->posisi_type):null;
+
+
+		if($data->jk=="l"){
+			$this->session->set_userdata("gender","cowok");
+		}else{
+			$this->session->set_userdata("gender","cewek");
+		}
+		$this->session->set_userdata("id",$id);
+		$this->session->set_userdata("kode_biro",$kode_biro );
+		$this->session->set_userdata("kode_istana",$kode_istana);
+		$this->session->set_userdata("username",$username);
+		$this->session->set_userdata("level","uk");
+		$this->session->set_userdata("id_level",17);
+		$this->session->set_userdata("level_ket","Unit Pengolah");
+		$this->session->set_userdata("posisi",$posisi);
+		$this->m_reff->log("Login");
+		$var["sts"] = true;
+		$var["direct"] = "ars_dashboard";
+		return $var;
+	}
+	///END UP
+
+
+
+
+
+
+
+
+
+
+
+
 				$this->db->where("nip",$nip);
 				$this->db->where("nip IS NOT NULL");
 				$this->db->where("nip!=''");
@@ -155,6 +246,7 @@ class M_login extends CI_Model  {
 						}
 
 							/* simpan sesssion */
+							$this->session->set_userdata("id_level",$id_level);
 							$this->session->set_userdata("level",$nama_level);
 							$this->session->set_userdata("level_ket",$level_ket);
 							$this->session->set_userdata("id",$id);
@@ -183,6 +275,10 @@ class M_login extends CI_Model  {
  
 
 				
+
+
+
+				
 					$peg = $this->mdl->getLoginPegawai($nip);
 					if(isset($peg->id)){ // jika login sebagai pegawai
 						$type 				=   isset($peg->jenis_pegawai)?($peg->jenis_pegawai):"";
@@ -197,6 +293,7 @@ class M_login extends CI_Model  {
 						
 					
 						if($type==1){  //jika login sebagai pegawai PNS
+							
 							$this->session->set_userdata("module","covid");
 							$this->session->set_userdata("level","register");
 							$this->session->set_userdata("level_ket","Register");
@@ -239,7 +336,54 @@ class M_login extends CI_Model  {
 
 
 
+	function change_access($nip,$level){
+		$this->db->where("nip",$nip);
+		$get = $this->db->get("data_pegawai")->row();
+		if(isset($get->id)){	 
+			if($get->jk=="l"){
+				$this->session->set_userdata("gender","cowok");
+			}else{
+				$this->session->set_userdata("gender","cewek");
+			}
 
+			$main = $this->db->get_where("main_level",array("id_level"=>$level))->row();
+
+			if($level==16)
+			{
+						$uk = $this->db->get_where("ars_tr_uk_employee",array("employee_nip"=>$nip))->row();
+						$posisi  = isset($uk->posisi_type)?($uk->posisi_type):null;
+						// $uk_uuid = isset($uk->uk_uuid)?($uk->uk_uuid):null;
+						// $tr_uk = $this->m_reff->goField("ars_tr_uk","type","where uuid='".$uk_uuid."' ");
+						if($posisi=="01"){
+							$uk = "I";
+						}elseif($posisi=="02"){
+							$uk = "II";
+						}elseif($posisi=="03"){
+							$uk = "III";
+						}
+				$this->session->set_userdata("level_ket",$main->ket." - $uk");		
+			}else{
+				$this->session->set_userdata("level_ket",$main->ket);
+			}
+
+				/* simpan sesssion */
+				$this->session->set_userdata("id_level",$level);
+				
+				$this->session->set_userdata("level",$main->nama);
+				$this->session->set_userdata("id",$nip);
+				$this->session->set_userdata("kode_biro",$get->kode_biro);
+				$this->session->set_userdata("kode_istana",$get->kode_istana);
+				$this->session->set_userdata("username",$get->nama);
+				$this->m_reff->log("Login :: change role");
+				// print_r($this->session->userdata());
+				//  return false;
+				$var["sts"] = true;
+				$var["direct"] = $main->direct;
+				return $var;
+		}
+				$var["sts"] = false;
+				return $var;
+	}
 
 
 

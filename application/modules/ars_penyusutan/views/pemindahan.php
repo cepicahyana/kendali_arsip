@@ -1,3 +1,11 @@
+<style>
+    table.dataTable>thead .sorting:before, table.dataTable>thead .sorting:after{
+        display: none !important;
+    }
+    .is-hidden{
+        display: none !important;
+    }
+</style>
 <div class="card">
     <div class="row card-body" style='padding-top:10px;padding-bottom:20px'>
         <div class="col-md-12" id="area_lod">
@@ -9,7 +17,7 @@
                         <th class='thread'>Tanggal</th>
                         <th class='thread'>Sumber</th>
                         <th class='thread'>Tujuan</th>
-                        <th class='thread'>Jml. Arsip</th>
+                        <th class='thread' width='60px'>Jml. Arsip</th>
                         <th class='thread text-center'>Status</th>
                         <th class='thread text-center' width='120px'># </th>
                     </tr>
@@ -77,7 +85,7 @@
     var dataTable = $('#table').DataTable({
         "paging": true,
         "processing": false,
-        "ordering": false,
+        "ordering": true,
         "language": {
             "sSearch": "Pencarian",
             "processing": ' <span class="sr-only dataTables_processing">Loading...</span> <br><b style="color:black;background:white">Proses menampilkan data<br> Mohon Menunggu..</b>',
@@ -95,10 +103,21 @@
         "serverSide": true,
         "responsive": true,
         "searching": true,
-        "lengthMenu": [
-            [10, 20, 30, 50],
-            [10, 20, 30, 50],
+        "order": [[0, 'desc']],
+        "columns": [
+            { className: "text-center", sortable: false },
+            { sortable: true },
+            { className: "text-center" },
+            null,
+            null,
+            { className: "text-center" },
+            { className: "text-center" },
+            { className: "text-center" }
         ],
+        // "lengthMenu": [
+        //     [10, 20, 30, 50],
+        //     [10, 20, 30, 50],
+        // ],
         dom: 'Blfrtip',
         buttons: [{
                 text: '<i class="fe fe-refresh-cw"></i>    ',
@@ -112,20 +131,20 @@
                 extend: 'excel',
                 text: '<i class="fe fe-download"></i>',
                 exportOptions: {
-                    columns: [0, 1]
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7]
                 },
                 className: 'btn  btn-secondary-light'
             },
             {
                 text: '<i class="fe fe-plus"></i> Request Pemindahan ',
                 action: function(e, dt, node, config) {
-                    action_form(0, 1);
+                    action_form(1);
                 },
                 className: 'btn  btn-secondary-light'
             },
         ],
         "ajax": {
-            "url": "<?php echo site_url('ars_penyusutan/getData_pemindahan'); ?>",
+            "url": "<?php echo site_url('ars_penyusutan/getList_pemindahan'); ?>",
             "type": "POST",
             "data": function(data) {
                 data.<?php echo $this->m_reff->tokenName() ?> = token;
@@ -148,16 +167,16 @@
         dataTable.ajax.reload(null, false);
     };
 
-    function action_form(id = null, status = null) {
-        if(parseInt(status??0) >= 3){
-            var url = "<?php echo site_url("ars_penyusutan/form_penerimaan_pemindahan/"); ?>" + (status ?? 0);
+    function action_form(status = null, uuid = null) {
+        if(parseInt(status??0) == 99 || parseInt(status??0) >= 3){
+            var url = "<?php echo site_url("ars_penyusutan/form_penerimaan_pemindahan/"); ?>" + (status ?? 0) + (uuid != null && uuid!= "" ? "/" + uuid :  "");
         }else{
-            var url = "<?php echo site_url("ars_penyusutan/form_pemindahan/"); ?>" + (status ?? 0);
+            var url = "<?php echo site_url("ars_penyusutan/form_pemindahan/"); ?>" + (status ?? 0) + (uuid != null && uuid!= "" ? "/" + uuid :  "");
         }
         var param = {
             ajax: "yes",
             <?php echo $this->m_reff->tokenName() ?>: token,
-            id: id,
+            uuid: uuid,
             status: status
         };
         $.ajax({
@@ -166,47 +185,32 @@
             data: param,
             url: url,
             success: function(data) {
-                // $("#token_footer").val(data["token"]);
                 token = data["token"];
                 $('.modal.aside').remove();
                 history.replaceState(data["title"], data["title"], url);
+
                 $('#bread_title').html(data["title"]);
                 $('#bread_subtitle').html(data["subtitle"]);
                 $(".content").html(data["data"]);
+                $("#status_form").val(data["status_form"] != null ? data["status_form"] : null)
+                $("#isrev").val(data["dataPemindahan"] != null ? data["dataPemindahan"]["isrev"] : null)
+                $("#uuid").val(data["dataPemindahan"] != null ? data["dataPemindahan"]["uuid"] : null)
+                $("#tanggal").val(data["dataPemindahan"] != null ? data["dataPemindahan"]["tanggal"] : null)
+                $("#pemberkasan_tipe").val(data["pemberkasanTipe"] != null ? data["pemberkasanTipe"] : null)
+                $("#dari_organisasi_kode").val(data["ttdDari"] != null ? data["ttdDari"]["organisasi_kode"] : null)
+                $("#dari_penandatangan_nama").val(data["ttdDari"] != null ? data["ttdDari"]["pegawai_nama"] : null)
+                $("#dari_penandatangan_jabatan").val(data["ttdDari"] != null ? data["ttdDari"]["pegawai_jabatan"] : null)
+                $("#tujuan_organisasi_kode").val(data["ttdTujuan"] != null ? data["ttdTujuan"]["organisasi_kode"] : null)
+                $("#tujuan_penandatangan_nama").val(data["ttdTujuan"] != null ? data["ttdTujuan"]["pegawai_nama"] : null)
+                $("#tujuan_penandatangan_jabatan").val(data["ttdTujuan"] != null ? data["ttdTujuan"]["pegawai_jabatan"] : null)
+                $("#info_tambahan").val(data["dataPemindahan"] != null ? data["dataPemindahan"]["info_tambahan"] : null)
 
-                var status = parseInt(data["status"] != null ? data["status"] : 0);
-                if (status == 1) {
-                    $('#btnHProses').show();
-                    $('#btnHBatal').show();
-                    $('#btnSave').show();
-                    $('#btnReqApprove').show();
-                } else if (status == 2) {
-                    $('#btnHProses').show();
-                    $('#btnHBatal').show();
-                    $('#btnSave').show();
-                    $('#btnApprove').show();
-                } else if (status == 3) {
-                    $('#btnHProses').show();
-                    $('#btnProsesTerima').show();
-                    $('#btnProsesTolak').show();
-                    $('#btnHBatalTerima').show();
-                    $('#btnHBatalTolak').show();
-                    $('#btnSave').show();
-                    $('#btnReqApprove').show();
-                } else if (status == 4) {
-                    $('#btnHProses').show();
-                    $('#btnProsesTerima').show();
-                    $('#btnProsesTolak').show();
-                    $('#btnHBatalTerima').show();
-                    $('#btnHBatalTolak').show();
-                    $('#btnSave').show();
-                    $('#btnApprove').show();
-                } else if (status == 5) {
-                    $('#btnSave').show();
-                    $('#uploadBA').show();
-                } else if (status == 99 || status == 98) {
-                    $('#btnBatal').show();
-                }
+                $("#tanggal_teks").text(data["dataPemindahan"] != null ? data["dataPemindahan"]["tanggal_teks"] : null)
+                $("#text_uk_tipe").text(data["ttdDari"] != null ? "UK" + data["ttdTujuan"]["uk_tipe"] : null)
+                $("#text_dari").text(data["ttdDari"] != null ? data["ttdDari"]["pegawai_nama"] : null)
+                $("#text_tujuan").text(data["ttdTujuan"] != null ? data["ttdTujuan"]["pegawai_nama"] : null)
+                dataTable;
+                dataTable2;
             }
         });
     }
@@ -317,7 +321,7 @@
         ],
         
         "ajax": {
-        	"url": "< ?php echo site_url('ars_penyusutan/getData_tingkaPerkembangan');?>",
+        	"url": "< ?php echo site_url('ars_penyusutan/getList_tingkaPerkembangan');?>",
         	"type": "POST",
         	"data": function ( data ) {
         		data.< ?php echo $this->m_reff->tokenName()?>=token;
